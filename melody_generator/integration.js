@@ -25,9 +25,8 @@ function initMelodyGenerator() {
 
         window.playRandomSound = async function() {
             try {
-                // С вероятностью 70% генерируем новую мелодию, 
-                // в остальных случаях воспроизводим оригинальный звук
-                if (Math.random() < 0.7 && melodyGenerator) {
+                // Всегда воспроизводим мелодию и голос одновременно
+                if (melodyGenerator) {
                     // Определяем настроение в зависимости от времени суток
                     const hour = new Date().getHours();
                     let mood;
@@ -40,18 +39,20 @@ function initMelodyGenerator() {
                         mood = 'calm'; // Вечер и ночь - спокойное настроение
                     }
 
-                    // Генерируем и воспроизводим мелодию
-                    await melodyGenerator.generateAndPlay({
+                    // Генерируем и воспроизводим мелодию (на фоне)
+                    melodyGenerator.generateAndPlay({
                         mood: mood,
                         duration: 30, // 30 секунд
                         tempo: 80 + Math.random() * 40 // 80-120 BPM
+                    }).catch(error => {
+                        console.error('Ошибка при генерации мелодии:', error);
                     });
-                } else {
-                    // Воспроизводим оригинальный звук
-                    originalPlayRandomSound();
                 }
+
+                // Воспроизводим голосовой файл
+                originalPlayRandomSound();
             } catch (error) {
-                console.error('Ошибка при генерации мелодии:', error);
+                console.error('Ошибка при воспроизведении:', error);
                 // В случае ошибки воспроизводим оригинальный звук
                 originalPlayRandomSound();
             }

@@ -7,6 +7,26 @@ let alarmDays = [];
 let alarmAudio;
 let scrollEndTimer;
 
+// Настройки звука для будильника и таймера
+let alarmSoundSettings = {
+    type: 'melody', // 'melody', 'voice', 'both'
+    melodyVolume: 0.7,
+    voiceVolume: 0.7
+};
+
+let timerSoundSettings = {
+    type: 'melody', // 'melody', 'voice', 'both'
+    melodyVolume: 0.7,
+    voiceVolume: 0.7
+};
+
+// DOM элементы для настроек звука таймера
+const timerSoundTypeRadios = document.querySelectorAll('input[name="timer-sound-type"]');
+const timerMelodyVolumeSlider = document.getElementById('timer-melody-volume');
+const timerMelodyVolumeValue = document.getElementById('timer-melody-volume-value');
+const timerVoiceVolumeSlider = document.getElementById('timer-voice-volume');
+const timerVoiceVolumeValue = document.getElementById('timer-voice-volume-value');
+
 // DOM элементы
 const alarmTab = document.getElementById('alarm-tab');
 const timerTab = document.getElementById('timer-tab');
@@ -76,6 +96,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Инициализация отображения таймера
     updateTimerDisplay();
+
+    // Инициализация обработчиков настроек звука
+    initSoundControls();
 });
 
 // Переключение вкладок
@@ -445,12 +468,16 @@ function triggerAlarm(type) {
     const notificationMessage = document.getElementById('notification-message');
 
     notificationTitle.textContent = type === 'Будильник' ? 'Просыпайся!' : 'Время вышло!';
-    notificationMessage.textContent = type === 'Будильник' ? 
-        'Время для новых свершений!' : 
+    notificationMessage.textContent = type === 'Будильник' ?
+        'Время для новых свершений!' :
         'Таймер завершен!';
 
-    // Воспроизводим случайную мелодию
-    playRandomSound();
+    // Воспроизводим звук в зависимости от типа
+    if (type === 'Будильник') {
+        playRandomSound(alarmSoundSettings.type);
+    } else {
+        playRandomSound(timerSoundSettings.type);
+    }
 
     // Показываем уведомление
     notification.classList.remove('hidden');
@@ -463,16 +490,28 @@ function triggerAlarm(type) {
 
 // Срабатывание таймера
 function triggerTimer() {
-    triggerAlarm('Таймер');
+    // Используем настройки звука для таймера
+    playRandomSound(timerSoundSettings.type);
     resetTimer();
 }
 
 // Воспроизведение случайного звука
-window.playRandomSound = function playRandomSound() {
+window.playRandomSound = function playRandomSound(soundType) {
     // Останавливаем предыдущий звук, если он есть
     if (alarmAudio) {
         alarmAudio.pause();
         alarmAudio = null;
+    }
+
+    // Определяем настройки звука в зависимости от типа
+    let settings;
+    if (soundType === 'alarm') {
+        settings = alarmSoundSettings;
+    } else if (soundType === 'timer') {
+        settings = timerSoundSettings;
+    } else {
+        // По умолчанию используем настройки будильника
+        settings = alarmSoundSettings;
     }
 
     // Генерируем случайный номер файла от 1 до 200
@@ -483,8 +522,19 @@ window.playRandomSound = function playRandomSound() {
     // Создаем новый аудио объект
     alarmAudio = new Audio(audioPath);
 
-    // Устанавливаем громкость и воспроизводим
-    alarmAudio.volume = 0.7;
+    // Устанавливаем громкость в зависимости от типа звука
+    if (settings.type === 'melody') {
+        alarmAudio.volume = settings.melodyVolume;
+    } else if (settings.type === 'voice') {
+        alarmAudio.volume = settings.voiceVolume;
+    } else if (settings.type === 'both') {
+        // Для 'both' используем среднее значение
+        alarmAudio.volume = (settings.melodyVolume + settings.voiceVolume) / 2;
+    } else {
+        alarmAudio.volume = 0.7; // Значение по умолчанию
+    }
+
+    // Воспроизводим
     alarmAudio.play().catch(error => {
         console.error('Ошибка воспроизведения аудио:', error);
     });
@@ -511,6 +561,35 @@ window.stopNotification = function stopNotification() {
     }
 }
 
+// Инициализация обработчиков настроек звука
+function initSoundControls() {
+    // Обработчики для типа звука таймера
+    timerSoundTypeRadios.forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            timerSoundSettings.type = e.target.value;
+            saveSettings();
+        });
+    });
+
+    // Обработчики для громкости мелодии таймера
+    if (timerMelodyVolumeSlider) {
+        timerMelodyVolumeSlider.addEventListener('input', (e) => {
+            timerSoundSettings.melodyVolume = e.target.value / 100;
+            timerMelodyVolumeValue.textContent = `${e.target.value}%`;
+            saveSettings();
+        });
+    }
+
+    // Обработчики для громкости голоса таймера
+    if (timerVoiceVolumeSlider) {
+        timerVoiceVolumeSlider.addEventListener('input', (e) => {
+            timerSoundSettings.voiceVolume = e.target.value / 100;
+            timerVoiceVolumeValue.textContent = `${e.target.value}%`;
+            saveSettings();
+        });
+    }
+}
+
 // Сохранение настроек в localStorage
 function saveSettings() {
     const settings = {
@@ -519,7 +598,8 @@ function saveSettings() {
         alarmDays: alarmDays,
         timerHours: document.getElementById('timer-hours').value,
         timerMinutes: document.getElementById('timer-minutes').value,
-        timerSeconds: document.getElementById('timer-seconds').value
+        timerSeconds: document.getElementById('timer-seconds').value,
+        timerSoundSettings: timerSoundSettings
     };
 
     localStorage.setItem('alarmTimerSettings', JSON.stringify(settings));
@@ -558,6 +638,29 @@ function loadSettings() {
             }
             if (settings.timerSeconds !== undefined) {
                 document.getElementById('timer-seconds').value = settings.timerSeconds;
+            }
+
+            // Загружаем настройки звука таймера
+            if (settings.timerSoundSettings !== undefined) {
+                timerSoundSettings = { ...timerSoundSettings, ...settings.timerSoundSettings };
+
+                // Обновляем интерфейс настроек звука таймера
+                const timerSoundTypeRadio = document.querySelector(`input[name="timer-sound-type"][value="${timerSoundSettings.type}"]`);
+                if (timerSoundTypeRadio) {
+                    timerSoundTypeRadio.checked = true;
+                }
+
+                if (timerMelodyVolumeSlider) {
+                    const melodyVolumePercent = Math.round(timerSoundSettings.melodyVolume * 100);
+                    timerMelodyVolumeSlider.value = melodyVolumePercent;
+                    timerMelodyVolumeValue.textContent = `${melodyVolumePercent}%`;
+                }
+
+                if (timerVoiceVolumeSlider) {
+                    const voiceVolumePercent = Math.round(timerSoundSettings.voiceVolume * 100);
+                    timerVoiceVolumeSlider.value = voiceVolumePercent;
+                    timerVoiceVolumeValue.textContent = `${voiceVolumePercent}%`;
+                }
             }
 
             // Обновляем отображение таймера

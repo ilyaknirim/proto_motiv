@@ -161,6 +161,37 @@
                     <p id="alarm-status-text">Будильник не установлен</p>
                 </div>
 
+                <div class="sound-settings">
+                    <h3>Настройки звука</h3>
+                    <div class="sound-type-selector">
+                        <label class="sound-type-option">
+                            <input type="radio" name="sound-type" value="melody" checked>
+                            <span>Мелодия</span>
+                        </label>
+                        <label class="sound-type-option">
+                            <input type="radio" name="sound-type" value="voice">
+                            <span>Голос</span>
+                        </label>
+                        <label class="sound-type-option">
+                            <input type="radio" name="sound-type" value="both">
+                            <span>Мелодия и голос</span>
+                        </label>
+                    </div>
+
+                    <div class="volume-controls">
+                        <div class="volume-control">
+                            <label for="melody-volume">Громкость мелодии</label>
+                            <input type="range" id="melody-volume" min="0" max="100" value="70">
+                            <span id="melody-volume-value">70%</span>
+                        </div>
+                        <div class="volume-control">
+                            <label for="voice-volume">Громкость голоса</label>
+                            <input type="range" id="voice-volume" min="0" max="100" value="70">
+                            <span id="voice-volume-value">70%</span>
+                        </div>
+                    </div>
+                </div>
+
                 <button id="set-alarm" class="action-btn"><i class="fas fa-bell"></i> Установить будильник</button>
                 <button id="cancel-alarm" class="action-btn cancel"><i class="fas fa-bell-slash"></i> Отменить будильник</button>
             </div>
@@ -336,6 +367,37 @@
 
                 <div class="timer-status">
                     <p id="timer-status-text">Таймер не запущен</p>
+                </div>
+
+                <div class="sound-settings">
+                    <h3>Настройки звука</h3>
+                    <div class="sound-type-selector">
+                        <label class="sound-type-option">
+                            <input type="radio" name="timer-sound-type" value="melody" checked>
+                            <span>Мелодия</span>
+                        </label>
+                        <label class="sound-type-option">
+                            <input type="radio" name="timer-sound-type" value="voice">
+                            <span>Голос</span>
+                        </label>
+                        <label class="sound-type-option">
+                            <input type="radio" name="timer-sound-type" value="both">
+                            <span>Мелодия и голос</span>
+                        </label>
+                    </div>
+
+                    <div class="volume-controls">
+                        <div class="volume-control">
+                            <label for="timer-melody-volume">Громкость мелодии</label>
+                            <input type="range" id="timer-melody-volume" min="0" max="100" value="70">
+                            <span id="timer-melody-volume-value">70%</span>
+                        </div>
+                        <div class="volume-control">
+                            <label for="timer-voice-volume">Громкость голоса</label>
+                            <input type="range" id="timer-voice-volume" min="0" max="100" value="70">
+                            <span id="timer-voice-volume-value">70%</span>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="timer-controls">
