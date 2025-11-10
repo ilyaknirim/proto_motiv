@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мотивирующий Будильник и Таймер</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Мотивирующий Будильник и Таймер</h1>
+        </header>
+
+        <main>
+            <div class="tabs">
+                <button id="alarm-tab" class="tab-btn active"><i class="fas fa-clock"></i> Будильник</button>
+                <button id="timer-tab" class="tab-btn"><i class="fas fa-hourglass-half"></i> Таймер</button>
+            </div>
+
+            <div id="alarm-panel" class="panel active">
+                <div class="time-setter">
+                    <div class="time-inputs">
+                        <input type="number" id="alarm-hours" min="0" max="23" value="07" placeholder="Часы">
+                        <span>:</span>
+                        <input type="number" id="alarm-minutes" min="0" max="59" value="00" placeholder="Минуты">
+                    </div>
+                    <div id="current-time" class="current-time"></div>
+                </div>
+
+                <div class="days-selector">
+                    <label class="day-checkbox">
+                        <input type="checkbox" id="mon" name="day" value="1">
+                        <span>Пн</span>
+                    </label>
+                    <label class="day-checkbox">
+                        <input type="checkbox" id="tue" name="day" value="2">
+                        <span>Вт</span>
+                    </label>
+                    <label class="day-checkbox">
+                        <input type="checkbox" id="wed" name="day" value="3">
+                        <span>Ср</span>
+                    </label>
+                    <label class="day-checkbox">
+                        <input type="checkbox" id="thu" name="day" value="4">
+                        <span>Чт</span>
+                    </label>
+                    <label class="day-checkbox">
+                        <input type="checkbox" id="fri" name="day" value="5">
+                        <span>Пт</span>
+                    </label>
+                    <label class="day-checkbox">
+                        <input type="checkbox" id="sat" name="day" value="6">
+                        <span>Сб</span>
+                    </label>
+                    <label class="day-checkbox">
+                        <input type="checkbox" id="sun" name="day" value="0">
+                        <span>Вс</span>
+                    </label>
+                </div>
+
+                <div class="alarm-status">
+                    <p id="alarm-status-text">Будильник не установлен</p>
+                </div>
+
+                <button id="set-alarm" class="action-btn"><i class="fas fa-bell"></i> Установить будильник</button>
+                <button id="cancel-alarm" class="action-btn cancel"><i class="fas fa-bell-slash"></i> Отменить будильник</button>
+            </div>
+
+            <div id="timer-panel" class="panel">
+                <div class="timer-display">
+                    <div class="timer-inputs">
+                        <div class="timer-input-group">
+                            <label>Часы</label>
+                            <input type="number" id="timer-hours" min="0" max="23" value="0">
+                        </div>
+                        <div class="timer-input-group">
+                            <label>Минуты</label>
+                            <input type="number" id="timer-minutes" min="0" max="59" value="5">
+                        </div>
+                        <div class="timer-input-group">
+                            <label>Секунды</label>
+                            <input type="number" id="timer-seconds" min="0" max="59" value="0">
+                        </div>
+                    </div>
+                    <div id="timer-display" class="timer-countdown">00:05:00</div>
+                </div>
+
+                <div class="timer-status">
+                    <p id="timer-status-text">Таймер не запущен</p>
+                </div>
+
+                <div class="timer-controls">
+                    <button id="start-timer" class="action-btn"><i class="fas fa-play"></i> Запустить</button>
+                    <button id="pause-timer" class="action-btn"><i class="fas fa-pause"></i> Пауза</button>
+                    <button id="reset-timer" class="action-btn cancel"><i class="fas fa-redo"></i> Сброс</button>
+                </div>
+            </div>
+        </main>
+
+        <div id="notification" class="notification hidden">
+            <div class="notification-content">
+                <div class="notification-icon">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <h2 id="notification-title">Время!</h2>
+                <p id="notification-message">Будильник сработал</p>
+                <button id="stop-notification" class="notification-btn">Остановить</button>
+            </div>
+        </div>
+
+        <footer>
+            <p>Мотивирующий будильник &copy; 2023</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

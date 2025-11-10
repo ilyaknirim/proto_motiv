@@ -1,0 +1,370 @@
+/* Глобальные стили */
+:root {
+    --primary-color: #4a6cf7;
+    --secondary-color: #6b7cff;
+    --accent-color: #ff6b6b;
+    --background-color: #1a1a2e;
+    --surface-color: #16213e;
+    --text-color: #eaeaea;
+    --text-secondary: #a0a0a0;
+    --success-color: #4caf50;
+    --warning-color: #ff9800;
+    --error-color: #f44336;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    width: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Заголовок */
+header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+header h1 {
+    font-weight: 300;
+    font-size: 2.2rem;
+    margin-bottom: 10px;
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Основной контент */
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Вкладки */
+.tabs {
+    display: flex;
+    margin-bottom: 20px;
+    background-color: var(--surface-color);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 15px;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tab-btn i {
+    margin-right: 8px;
+}
+
+.tab-btn.active {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.tab-btn:hover:not(.active) {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Панели */
+.panel {
+    display: none;
+    flex-direction: column;
+    background-color: var(--surface-color);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.panel.active {
+    display: flex;
+}
+
+/* Установка времени */
+.time-setter {
+    margin-bottom: 20px;
+}
+
+.time-inputs {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.time-inputs input {
+    width: 80px;
+    height: 80px;
+    font-size: 2.5rem;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    margin: 0 10px;
+}
+
+.time-inputs span {
+    font-size: 2.5rem;
+    font-weight: 300;
+}
+
+.current-time {
+    text-align: center;
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+}
+
+/* Селектор дней недели */
+.days-selector {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.day-checkbox {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    margin: 5px;
+}
+
+.day-checkbox input {
+    display: none;
+}
+
+.day-checkbox span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.day-checkbox input:checked + span {
+    background-color: var(--primary-color);
+}
+
+/* Статус */
+.alarm-status, .timer-status {
+    text-align: center;
+    margin: 15px 0;
+    font-style: italic;
+    color: var(--text-secondary);
+}
+
+/* Кнопки */
+.action-btn {
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    margin: 5px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.action-btn i {
+    margin-right: 8px;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(74, 108, 247, 0.4);
+}
+
+.action-btn.cancel {
+    background: linear-gradient(45deg, var(--error-color), #d32f2f);
+}
+
+.action-btn.cancel:hover {
+    box-shadow: 0 5px 15px rgba(244, 67, 54, 0.4);
+}
+
+/* Таймер */
+.timer-display {
+    margin-bottom: 20px;
+}
+
+.timer-inputs {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+}
+
+.timer-input-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.timer-input-group label {
+    margin-bottom: 5px;
+    color: var(--text-secondary);
+}
+
+.timer-input-group input {
+    width: 70px;
+    height: 70px;
+    font-size: 2rem;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 10px;
+    color: white;
+}
+
+.timer-countdown {
+    font-size: 3rem;
+    text-align: center;
+    font-weight: 300;
+    color: var(--primary-color);
+}
+
+.timer-controls {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* Уведомление */
+.notification {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    transition: opacity 0.3s ease;
+}
+
+.notification.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.notification-content {
+    background: var(--surface-color);
+    border-radius: 15px;
+    padding: 30px;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.notification:not(.hidden) .notification-content {
+    transform: scale(1);
+}
+
+.notification-icon {
+    font-size: 3rem;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.notification h2 {
+    margin-bottom: 10px;
+    color: var(--primary-color);
+}
+
+.notification-btn {
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-top: 15px;
+    transition: all 0.3s ease;
+}
+
+.notification-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(74, 108, 247, 0.4);
+}
+
+/* Подвал */
+footer {
+    text-align: center;
+    padding: 20px 0;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+/* Адаптивность */
+@media (max-width: 600px) {
+    header h1 {
+        font-size: 1.8rem;
+    }
+
+    .time-inputs input, .timer-input-group input {
+        width: 60px;
+        height: 60px;
+        font-size: 2rem;
+    }
+
+    .timer-countdown {
+        font-size: 2.5rem;
+    }
+
+    .day-checkbox span {
+        width: 35px;
+        height: 35px;
+    }
+}
