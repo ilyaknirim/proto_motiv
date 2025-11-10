@@ -1,434 +1,56 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мотивирующий Будильник и Таймер</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Motiv v2 — Полная версия</title>
+<link rel="stylesheet" href="styles_refactor.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Мотивирующий Будильник и Таймер</h1>
-        </header>
+  <main class="container">
+    <header>
+      <h1>Motiv — Просыпайся с желанием</h1>
+      <p class="tagline">Полная сборка — генератор мелодий + коллекция мотиваций</p>
+    </header>
 
-        <main>
-            <div class="tabs">
-                <button id="alarm-tab" class="tab-btn active"><i class="fas fa-clock"></i> Будильник</button>
-                <button id="timer-tab" class="tab-btn"><i class="fas fa-hourglass-half"></i> Таймер</button>
-            </div>
+    <section class="controls">
+      <label>
+        Время пробуждения
+        <input id="wakeTime" type="time">
+      </label>
+      <label>
+        Громкость
+        <input id="volume" type="range" min="0" max="1" step="0.01" value="0.8">
+      </label>
+      <button id="setWake">Установить будильник</button>
+      <button id="stopAll" class="secondary">Остановить всё</button>
+    </section>
 
-            <div id="alarm-panel" class="panel active">
-                <div class="time-setter">
-                    <div class="time-picker-container">
-                        <div class="time-picker">
-                            <div class="time-picker-column" id="hours-column">
-                                <div class="time-picker-label">Часы</div>
-                                <div class="time-picker-wheel" id="hours-wheel">
-                                    <div class="time-picker-item" data-value="0">00</div>
-                                    <div class="time-picker-item" data-value="1">01</div>
-                                    <div class="time-picker-item" data-value="2">02</div>
-                                    <div class="time-picker-item" data-value="3">03</div>
-                                    <div class="time-picker-item" data-value="4">04</div>
-                                    <div class="time-picker-item" data-value="5">05</div>
-                                    <div class="time-picker-item" data-value="6">06</div>
-                                    <div class="time-picker-item selected" data-value="7">07</div>
-                                    <div class="time-picker-item" data-value="8">08</div>
-                                    <div class="time-picker-item" data-value="9">09</div>
-                                    <div class="time-picker-item" data-value="10">10</div>
-                                    <div class="time-picker-item" data-value="11">11</div>
-                                    <div class="time-picker-item" data-value="12">12</div>
-                                    <div class="time-picker-item" data-value="13">13</div>
-                                    <div class="time-picker-item" data-value="14">14</div>
-                                    <div class="time-picker-item" data-value="15">15</div>
-                                    <div class="time-picker-item" data-value="16">16</div>
-                                    <div class="time-picker-item" data-value="17">17</div>
-                                    <div class="time-picker-item" data-value="18">18</div>
-                                    <div class="time-picker-item" data-value="19">19</div>
-                                    <div class="time-picker-item" data-value="20">20</div>
-                                    <div class="time-picker-item" data-value="21">21</div>
-                                    <div class="time-picker-item" data-value="22">22</div>
-                                    <div class="time-picker-item" data-value="23">23</div>
-                                </div>
-                            </div>
-                            <div class="time-picker-column">
-                                <div class="time-picker-label">Минуты</div>
-                                <div class="time-picker-wheel" id="minutes-wheel">
-                                    <div class="time-picker-item selected" data-value="0">00</div>
-                                    <div class="time-picker-item" data-value="1">01</div>
-                                    <div class="time-picker-item" data-value="2">02</div>
-                                    <div class="time-picker-item" data-value="3">03</div>
-                                    <div class="time-picker-item" data-value="4">04</div>
-                                    <div class="time-picker-item" data-value="5">05</div>
-                                    <div class="time-picker-item" data-value="6">06</div>
-                                    <div class="time-picker-item" data-value="7">07</div>
-                                    <div class="time-picker-item" data-value="8">08</div>
-                                    <div class="time-picker-item" data-value="9">09</div>
-                                    <div class="time-picker-item" data-value="10">10</div>
-                                    <div class="time-picker-item" data-value="11">11</div>
-                                    <div class="time-picker-item" data-value="12">12</div>
-                                    <div class="time-picker-item" data-value="13">13</div>
-                                    <div class="time-picker-item" data-value="14">14</div>
-                                    <div class="time-picker-item" data-value="15">15</div>
-                                    <div class="time-picker-item" data-value="16">16</div>
-                                    <div class="time-picker-item" data-value="17">17</div>
-                                    <div class="time-picker-item" data-value="18">18</div>
-                                    <div class="time-picker-item" data-value="19">19</div>
-                                    <div class="time-picker-item" data-value="20">20</div>
-                                    <div class="time-picker-item" data-value="21">21</div>
-                                    <div class="time-picker-item" data-value="22">22</div>
-                                    <div class="time-picker-item" data-value="23">23</div>
-                                    <div class="time-picker-item" data-value="24">24</div>
-                                    <div class="time-picker-item" data-value="25">25</div>
-                                    <div class="time-picker-item" data-value="26">26</div>
-                                    <div class="time-picker-item" data-value="27">27</div>
-                                    <div class="time-picker-item" data-value="28">28</div>
-                                    <div class="time-picker-item" data-value="29">29</div>
-                                    <div class="time-picker-item" data-value="30">30</div>
-                                    <div class="time-picker-item" data-value="31">31</div>
-                                    <div class="time-picker-item" data-value="32">32</div>
-                                    <div class="time-picker-item" data-value="33">33</div>
-                                    <div class="time-picker-item" data-value="34">34</div>
-                                    <div class="time-picker-item" data-value="35">35</div>
-                                    <div class="time-picker-item" data-value="36">36</div>
-                                    <div class="time-picker-item" data-value="37">37</div>
-                                    <div class="time-picker-item" data-value="38">38</div>
-                                    <div class="time-picker-item" data-value="39">39</div>
-                                    <div class="time-picker-item" data-value="40">40</div>
-                                    <div class="time-picker-item" data-value="41">41</div>
-                                    <div class="time-picker-item" data-value="42">42</div>
-                                    <div class="time-picker-item" data-value="43">43</div>
-                                    <div class="time-picker-item" data-value="44">44</div>
-                                    <div class="time-picker-item" data-value="45">45</div>
-                                    <div class="time-picker-item" data-value="46">46</div>
-                                    <div class="time-picker-item" data-value="47">47</div>
-                                    <div class="time-picker-item" data-value="48">48</div>
-                                    <div class="time-picker-item" data-value="49">49</div>
-                                    <div class="time-picker-item" data-value="50">50</div>
-                                    <div class="time-picker-item" data-value="51">51</div>
-                                    <div class="time-picker-item" data-value="52">52</div>
-                                    <div class="time-picker-item" data-value="53">53</div>
-                                    <div class="time-picker-item" data-value="54">54</div>
-                                    <div class="time-picker-item" data-value="55">55</div>
-                                    <div class="time-picker-item" data-value="56">56</div>
-                                    <div class="time-picker-item" data-value="57">57</div>
-                                    <div class="time-picker-item" data-value="58">58</div>
-                                    <div class="time-picker-item" data-value="59">59</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="time-picker-center-indicator"></div>
-                    </div>
-                    <div id="current-time" class="current-time"></div>
-                </div>
+    <section class="generator">
+      <h2>Генератор мотивации</h2>
+      <div style="display:flex;gap:8px;align-items:center">
+        <select id="envSelect">
+          <option value="forest">Лес (утро)</option>
+          <option value="ocean">Океан</option>
+          <option value="morning">Утренние звуки</option>
+        </select>
+        <button id="genPlay">Сгенерировать и проиграть</button>
+        <button id="genStop" class="secondary">Остановить генератор</button>
+      </div>
+      <p class="small">Генератор использует Web Audio API и встроенные атмосферные звуки.</p>
+    </section>
 
-                <div class="days-selector">
-                    <label class="day-checkbox">
-                        <input type="checkbox" id="mon" name="day" value="1">
-                        <span>Пн</span>
-                    </label>
-                    <label class="day-checkbox">
-                        <input type="checkbox" id="tue" name="day" value="2">
-                        <span>Вт</span>
-                    </label>
-                    <label class="day-checkbox">
-                        <input type="checkbox" id="wed" name="day" value="3">
-                        <span>Ср</span>
-                    </label>
-                    <label class="day-checkbox">
-                        <input type="checkbox" id="thu" name="day" value="4">
-                        <span>Чт</span>
-                    </label>
-                    <label class="day-checkbox">
-                        <input type="checkbox" id="fri" name="day" value="5">
-                        <span>Пт</span>
-                    </label>
-                    <label class="day-checkbox">
-                        <input type="checkbox" id="sat" name="day" value="6">
-                        <span>Сб</span>
-                    </label>
-                    <label class="day-checkbox">
-                        <input type="checkbox" id="sun" name="day" value="0">
-                        <span>Вс</span>
-                    </label>
-                </div>
+    <section class="preview">
+      <h2>Предпрослушивание мотиваций</h2>
+      <div id="audioList" class="audio-list"></div>
+    </section>
 
-                <div class="alarm-status">
-                    <p id="alarm-status-text">Будильник не установлен</p>
-                </div>
+    <footer>
+      <small>Полная сборка: все аудиофайлы включены.</small>
+    </footer>
+  </main>
 
-                <div class="sound-settings">
-                    <h3>Настройки звука</h3>
-                    <div class="sound-type-selector">
-                        <label class="sound-type-option">
-                            <input type="radio" name="sound-type" value="melody" checked>
-                            <span>Мелодия</span>
-                        </label>
-                        <label class="sound-type-option">
-                            <input type="radio" name="sound-type" value="voice">
-                            <span>Голос</span>
-                        </label>
-                        <label class="sound-type-option">
-                            <input type="radio" name="sound-type" value="both">
-                            <span>Мелодия и голос</span>
-                        </label>
-                    </div>
-
-                    <div class="volume-controls">
-                        <div class="volume-control">
-                            <label for="melody-volume">Громкость мелодии</label>
-                            <input type="range" id="melody-volume" min="0" max="100" value="70">
-                            <span id="melody-volume-value">70%</span>
-                        </div>
-                        <div class="volume-control">
-                            <label for="voice-volume">Громкость голоса</label>
-                            <input type="range" id="voice-volume" min="0" max="100" value="70">
-                            <span id="voice-volume-value">70%</span>
-                        </div>
-                    </div>
-                </div>
-
-                <button id="set-alarm" class="action-btn"><i class="fas fa-bell"></i> Установить будильник</button>
-                <button id="cancel-alarm" class="action-btn cancel"><i class="fas fa-bell-slash"></i> Отменить будильник</button>
-            </div>
-
-            <div id="timer-panel" class="panel">
-                <div class="timer-display">
-                    <div class="time-picker-container">
-                        <div class="time-picker timer-picker">
-                            <div class="time-picker-column" id="timer-hours-column">
-                                <div class="time-picker-label">Часы</div>
-                                <div class="time-picker-wheel" id="timer-hours-wheel">
-                                    <div class="time-picker-item selected" data-value="0">00</div>
-                                    <div class="time-picker-item" data-value="1">01</div>
-                                    <div class="time-picker-item" data-value="2">02</div>
-                                    <div class="time-picker-item" data-value="3">03</div>
-                                    <div class="time-picker-item" data-value="4">04</div>
-                                    <div class="time-picker-item" data-value="5">05</div>
-                                    <div class="time-picker-item" data-value="6">06</div>
-                                    <div class="time-picker-item" data-value="7">07</div>
-                                    <div class="time-picker-item" data-value="8">08</div>
-                                    <div class="time-picker-item" data-value="9">09</div>
-                                    <div class="time-picker-item" data-value="10">10</div>
-                                    <div class="time-picker-item" data-value="11">11</div>
-                                    <div class="time-picker-item" data-value="12">12</div>
-                                    <div class="time-picker-item" data-value="13">13</div>
-                                    <div class="time-picker-item" data-value="14">14</div>
-                                    <div class="time-picker-item" data-value="15">15</div>
-                                    <div class="time-picker-item" data-value="16">16</div>
-                                    <div class="time-picker-item" data-value="17">17</div>
-                                    <div class="time-picker-item" data-value="18">18</div>
-                                    <div class="time-picker-item" data-value="19">19</div>
-                                    <div class="time-picker-item" data-value="20">20</div>
-                                    <div class="time-picker-item" data-value="21">21</div>
-                                    <div class="time-picker-item" data-value="22">22</div>
-                                    <div class="time-picker-item" data-value="23">23</div>
-                                </div>
-                            </div>
-                            <div class="time-picker-column" id="timer-minutes-column">
-                                <div class="time-picker-label">Минуты</div>
-                                <div class="time-picker-wheel" id="timer-minutes-wheel">
-                                    <div class="time-picker-item" data-value="0">00</div>
-                                    <div class="time-picker-item" data-value="1">01</div>
-                                    <div class="time-picker-item" data-value="2">02</div>
-                                    <div class="time-picker-item" data-value="3">03</div>
-                                    <div class="time-picker-item" data-value="4">04</div>
-                                    <div class="time-picker-item selected" data-value="5">05</div>
-                                    <div class="time-picker-item" data-value="6">06</div>
-                                    <div class="time-picker-item" data-value="7">07</div>
-                                    <div class="time-picker-item" data-value="8">08</div>
-                                    <div class="time-picker-item" data-value="9">09</div>
-                                    <div class="time-picker-item" data-value="10">10</div>
-                                    <div class="time-picker-item" data-value="11">11</div>
-                                    <div class="time-picker-item" data-value="12">12</div>
-                                    <div class="time-picker-item" data-value="13">13</div>
-                                    <div class="time-picker-item" data-value="14">14</div>
-                                    <div class="time-picker-item" data-value="15">15</div>
-                                    <div class="time-picker-item" data-value="16">16</div>
-                                    <div class="time-picker-item" data-value="17">17</div>
-                                    <div class="time-picker-item" data-value="18">18</div>
-                                    <div class="time-picker-item" data-value="19">19</div>
-                                    <div class="time-picker-item" data-value="20">20</div>
-                                    <div class="time-picker-item" data-value="21">21</div>
-                                    <div class="time-picker-item" data-value="22">22</div>
-                                    <div class="time-picker-item" data-value="23">23</div>
-                                    <div class="time-picker-item" data-value="24">24</div>
-                                    <div class="time-picker-item" data-value="25">25</div>
-                                    <div class="time-picker-item" data-value="26">26</div>
-                                    <div class="time-picker-item" data-value="27">27</div>
-                                    <div class="time-picker-item" data-value="28">28</div>
-                                    <div class="time-picker-item" data-value="29">29</div>
-                                    <div class="time-picker-item" data-value="30">30</div>
-                                    <div class="time-picker-item" data-value="31">31</div>
-                                    <div class="time-picker-item" data-value="32">32</div>
-                                    <div class="time-picker-item" data-value="33">33</div>
-                                    <div class="time-picker-item" data-value="34">34</div>
-                                    <div class="time-picker-item" data-value="35">35</div>
-                                    <div class="time-picker-item" data-value="36">36</div>
-                                    <div class="time-picker-item" data-value="37">37</div>
-                                    <div class="time-picker-item" data-value="38">38</div>
-                                    <div class="time-picker-item" data-value="39">39</div>
-                                    <div class="time-picker-item" data-value="40">40</div>
-                                    <div class="time-picker-item" data-value="41">41</div>
-                                    <div class="time-picker-item" data-value="42">42</div>
-                                    <div class="time-picker-item" data-value="43">43</div>
-                                    <div class="time-picker-item" data-value="44">44</div>
-                                    <div class="time-picker-item" data-value="45">45</div>
-                                    <div class="time-picker-item" data-value="46">46</div>
-                                    <div class="time-picker-item" data-value="47">47</div>
-                                    <div class="time-picker-item" data-value="48">48</div>
-                                    <div class="time-picker-item" data-value="49">49</div>
-                                    <div class="time-picker-item" data-value="50">50</div>
-                                    <div class="time-picker-item" data-value="51">51</div>
-                                    <div class="time-picker-item" data-value="52">52</div>
-                                    <div class="time-picker-item" data-value="53">53</div>
-                                    <div class="time-picker-item" data-value="54">54</div>
-                                    <div class="time-picker-item" data-value="55">55</div>
-                                    <div class="time-picker-item" data-value="56">56</div>
-                                    <div class="time-picker-item" data-value="57">57</div>
-                                    <div class="time-picker-item" data-value="58">58</div>
-                                    <div class="time-picker-item" data-value="59">59</div>
-                                </div>
-                            </div>
-                            <div class="time-picker-column" id="timer-seconds-column">
-                                <div class="time-picker-label">Секунды</div>
-                                <div class="time-picker-wheel" id="timer-seconds-wheel">
-                                    <div class="time-picker-item selected" data-value="0">00</div>
-                                    <div class="time-picker-item" data-value="1">01</div>
-                                    <div class="time-picker-item" data-value="2">02</div>
-                                    <div class="time-picker-item" data-value="3">03</div>
-                                    <div class="time-picker-item" data-value="4">04</div>
-                                    <div class="time-picker-item" data-value="5">05</div>
-                                    <div class="time-picker-item" data-value="6">06</div>
-                                    <div class="time-picker-item" data-value="7">07</div>
-                                    <div class="time-picker-item" data-value="8">08</div>
-                                    <div class="time-picker-item" data-value="9">09</div>
-                                    <div class="time-picker-item" data-value="10">10</div>
-                                    <div class="time-picker-item" data-value="11">11</div>
-                                    <div class="time-picker-item" data-value="12">12</div>
-                                    <div class="time-picker-item" data-value="13">13</div>
-                                    <div class="time-picker-item" data-value="14">14</div>
-                                    <div class="time-picker-item" data-value="15">15</div>
-                                    <div class="time-picker-item" data-value="16">16</div>
-                                    <div class="time-picker-item" data-value="17">17</div>
-                                    <div class="time-picker-item" data-value="18">18</div>
-                                    <div class="time-picker-item" data-value="19">19</div>
-                                    <div class="time-picker-item" data-value="20">20</div>
-                                    <div class="time-picker-item" data-value="21">21</div>
-                                    <div class="time-picker-item" data-value="22">22</div>
-                                    <div class="time-picker-item" data-value="23">23</div>
-                                    <div class="time-picker-item" data-value="24">24</div>
-                                    <div class="time-picker-item" data-value="25">25</div>
-                                    <div class="time-picker-item" data-value="26">26</div>
-                                    <div class="time-picker-item" data-value="27">27</div>
-                                    <div class="time-picker-item" data-value="28">28</div>
-                                    <div class="time-picker-item" data-value="29">29</div>
-                                    <div class="time-picker-item" data-value="30">30</div>
-                                    <div class="time-picker-item" data-value="31">31</div>
-                                    <div class="time-picker-item" data-value="32">32</div>
-                                    <div class="time-picker-item" data-value="33">33</div>
-                                    <div class="time-picker-item" data-value="34">34</div>
-                                    <div class="time-picker-item" data-value="35">35</div>
-                                    <div class="time-picker-item" data-value="36">36</div>
-                                    <div class="time-picker-item" data-value="37">37</div>
-                                    <div class="time-picker-item" data-value="38">38</div>
-                                    <div class="time-picker-item" data-value="39">39</div>
-                                    <div class="time-picker-item" data-value="40">40</div>
-                                    <div class="time-picker-item" data-value="41">41</div>
-                                    <div class="time-picker-item" data-value="42">42</div>
-                                    <div class="time-picker-item" data-value="43">43</div>
-                                    <div class="time-picker-item" data-value="44">44</div>
-                                    <div class="time-picker-item" data-value="45">45</div>
-                                    <div class="time-picker-item" data-value="46">46</div>
-                                    <div class="time-picker-item" data-value="47">47</div>
-                                    <div class="time-picker-item" data-value="48">48</div>
-                                    <div class="time-picker-item" data-value="49">49</div>
-                                    <div class="time-picker-item" data-value="50">50</div>
-                                    <div class="time-picker-item" data-value="51">51</div>
-                                    <div class="time-picker-item" data-value="52">52</div>
-                                    <div class="time-picker-item" data-value="53">53</div>
-                                    <div class="time-picker-item" data-value="54">54</div>
-                                    <div class="time-picker-item" data-value="55">55</div>
-                                    <div class="time-picker-item" data-value="56">56</div>
-                                    <div class="time-picker-item" data-value="57">57</div>
-                                    <div class="time-picker-item" data-value="58">58</div>
-                                    <div class="time-picker-item" data-value="59">59</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="time-picker-center-indicator"></div>
-                    </div>
-                    <div id="timer-display" class="timer-countdown">00:05:00</div>
-                </div>
-
-                <div class="timer-status">
-                    <p id="timer-status-text">Таймер не запущен</p>
-                </div>
-
-                <div class="sound-settings">
-                    <h3>Настройки звука</h3>
-                    <div class="sound-type-selector">
-                        <label class="sound-type-option">
-                            <input type="radio" name="timer-sound-type" value="melody" checked>
-                            <span>Мелодия</span>
-                        </label>
-                        <label class="sound-type-option">
-                            <input type="radio" name="timer-sound-type" value="voice">
-                            <span>Голос</span>
-                        </label>
-                        <label class="sound-type-option">
-                            <input type="radio" name="timer-sound-type" value="both">
-                            <span>Мелодия и голос</span>
-                        </label>
-                    </div>
-
-                    <div class="volume-controls">
-                        <div class="volume-control">
-                            <label for="timer-melody-volume">Громкость мелодии</label>
-                            <input type="range" id="timer-melody-volume" min="0" max="100" value="70">
-                            <span id="timer-melody-volume-value">70%</span>
-                        </div>
-                        <div class="volume-control">
-                            <label for="timer-voice-volume">Громкость голоса</label>
-                            <input type="range" id="timer-voice-volume" min="0" max="100" value="70">
-                            <span id="timer-voice-volume-value">70%</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="timer-controls">
-                    <button id="start-timer" class="action-btn"><i class="fas fa-play"></i> Запустить</button>
-                    <button id="pause-timer" class="action-btn"><i class="fas fa-pause"></i> Пауза</button>
-                    <button id="reset-timer" class="action-btn cancel"><i class="fas fa-redo"></i> Сброс</button>
-                </div>
-            </div>
-        </main>
-
-        <div id="notification" class="notification hidden">
-            <div class="notification-content">
-                <div class="notification-icon">
-                    <i class="fas fa-bell"></i>
-                </div>
-                <h2 id="notification-title">Время!</h2>
-                <p id="notification-message">Будильник сработал</p>
-                <button id="stop-notification" class="notification-btn">Остановить</button>
-            </div>
-        </div>
-
-        <footer>
-            <p>Мотивирующий будильник &copy; 2023</p>
-        </footer>
-    </div>
-
-    <!-- Скрипты генератора звуков природы -->
-    <script src="melody_generator/nature_sounds_generator.js"></script>
-    <script src="melody_generator/integration.js"></script>
-
-    <!-- Основной скрипт -->
-    <script src="script.js"></script>
+<script src="melody_generator/integration.js"></script>
+<script type="module" src="app_integration.js"></script>
 </body>
 </html>
