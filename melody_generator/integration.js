@@ -1,13 +1,13 @@
 
 /**
- * Интеграция системы генерации мелодий в основной проект
+ * Интеграция системы генерации звуков природы в основной проект
  */
 
-// Глобальная переменная для генератора мелодий
-let melodyGenerator = null;
+// Глобальная переменная для генератора звуков природы
+let natureSoundsGenerator = null;
 
 /**
- * Инициализация генератора мелодий
+ * Инициализация генератора звуков природы
  */
 function initMelodyGenerator() {
     // Проверяем поддержку Web Audio API
@@ -16,8 +16,8 @@ function initMelodyGenerator() {
         return;
     }
 
-    // Инициализируем генератор мелодий
-    melodyGenerator = new MelodyGenerator();
+    // Инициализируем генератор звуков природы
+    natureSoundsGenerator = new NatureSoundsGenerator();
 
     // Заменяем функцию playRandomSound в основном скрипте
     if (typeof window.playRandomSound === 'function') {
@@ -25,32 +25,34 @@ function initMelodyGenerator() {
 
         window.playRandomSound = async function() {
             try {
-                // Всегда воспроизводим мелодию и голос одновременно
-                if (melodyGenerator) {
-                    // Определяем настроение в зависимости от времени суток
+                // С вероятностью 70% воспроизводим звуки природы
+                if (natureSoundsGenerator && Math.random() > 0.3) {
+                    // Определяем тип среды в зависимости от времени суток
                     const hour = new Date().getHours();
-                    let mood;
+                    let environment;
 
-                    if (hour >= 6 && hour < 12) {
-                        mood = 'happy'; // Утро - бодрое настроение
-                    } else if (hour >= 12 && hour < 18) {
-                        mood = 'energetic'; // День - энергичное настроение
+                    if (hour >= 5 && hour < 9) {
+                        environment = 'morning'; // Раннее утро - звуки пробуждения природы
+                    } else if (hour >= 9 && hour < 17) {
+                        environment = 'forest'; // День - звуки леса
+                    } else if (hour >= 17 && hour < 21) {
+                        environment = 'ocean'; // Вечер - звуки океана
                     } else {
-                        mood = 'calm'; // Вечер и ночь - спокойное настроение
+                        environment = 'rain'; // Ночь - звуки дождя
                     }
 
-                    // Генерируем и воспроизводим мелодию (на фоне)
-                    melodyGenerator.generateAndPlay({
-                        mood: mood,
-                        duration: 30, // 30 секунд
-                        tempo: 80 + Math.random() * 40 // 80-120 BPM
+                    // Генерируем и воспроизводим звуки природы (на фоне)
+                    natureSoundsGenerator.generateAndPlay({
+                        environment: environment,
+                        duration: 120, // 2 минуты
+                        fadeInTime: 30 // 30 секунд на нарастание
                     }).catch(error => {
-                        console.error('Ошибка при генерации мелодии:', error);
+                        console.error('Ошибка при генерации звуков природы:', error);
                     });
+                } else {
+                    // В остальных случаях воспроизводим оригинальный звук
+                    originalPlayRandomSound();
                 }
-
-                // Воспроизводим голосовой файл
-                originalPlayRandomSound();
             } catch (error) {
                 console.error('Ошибка при воспроизведении:', error);
                 // В случае ошибки воспроизводим оригинальный звук
@@ -59,14 +61,14 @@ function initMelodyGenerator() {
         };
     }
 
-    // Добавляем функцию для остановки мелодии
+    // Добавляем функцию для остановки звуков
     if (typeof window.stopNotification === 'function') {
         const originalStopNotification = window.stopNotification;
 
         window.stopNotification = function() {
-            // Останавливаем генератор мелодий
-            if (melodyGenerator) {
-                melodyGenerator.stop();
+            // Останавливаем генератор звуков природы
+            if (natureSoundsGenerator) {
+                natureSoundsGenerator.stop();
             }
 
             // Вызываем оригинальную функцию
