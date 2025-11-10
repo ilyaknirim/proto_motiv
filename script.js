@@ -468,7 +468,7 @@ function triggerTimer() {
 }
 
 // Воспроизведение случайного звука
-function playRandomSound() {
+window.playRandomSound = function playRandomSound() {
     // Останавливаем предыдущий звук, если он есть
     if (alarmAudio) {
         alarmAudio.pause();
@@ -501,7 +501,7 @@ function playRandomSound() {
 }
 
 // Остановка уведомления
-function stopNotification() {
+window.stopNotification = function stopNotification() {
     notification.classList.add('hidden');
 
     // Останавливаем воспроизведение звука
