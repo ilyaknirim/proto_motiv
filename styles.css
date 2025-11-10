@@ -116,34 +116,123 @@ main {
     margin-bottom: 20px;
 }
 
-.time-inputs {
+.time-picker-container {
+    position: relative;
+    background: var(--surface-color);
+    border-radius: 15px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    height: 250px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.time-picker {
+    display: flex;
+    height: 100%;
+    position: relative;
+}
+
+.time-picker-column {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.time-picker-label {
+    text-align: center;
+    padding: 10px 0;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.time-picker-wheel {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: relative;
+    padding: 85px 0;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE и Edge */
+}
+
+.time-picker-wheel::-webkit-scrollbar {
+    display: none; /* Chrome, Safari и Opera */
+}
+
+.time-picker-item {
+    height: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 15px;
+    font-size: 1.8rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
 }
 
-.time-inputs input {
-    width: 80px;
-    height: 80px;
-    font-size: 2.5rem;
-    text-align: center;
-    background: rgba(255, 255, 255, 0.1);
-    border: none;
-    border-radius: 10px;
-    color: white;
-    margin: 0 10px;
+.time-picker-item.selected {
+    color: var(--primary-color);
+    font-weight: 500;
+    font-size: 2.2rem;
 }
 
-.time-inputs span {
-    font-size: 2.5rem;
-    font-weight: 300;
+.time-picker-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.time-picker-center-indicator {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 50px;
+    transform: translateY(-50%);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.timer-picker .time-picker-item {
+    height: 40px;
+    font-size: 1.5rem;
+}
+
+.timer-picker .time-picker-item.selected {
+    font-size: 1.8rem;
+}
+
+.timer-picker .time-picker-wheel {
+    padding: 90px 0;
+}
+
+.timer-picker .time-picker-center-indicator {
+    height: 40px;
 }
 
 .current-time {
     text-align: center;
     font-size: 1.2rem;
     color: var(--text-secondary);
+}
+
+/* Стили для таймера */
+.timer-display {
+    margin-bottom: 20px;
+}
+
+.timer-countdown {
+    font-size: 3rem;
+    text-align: center;
+    font-weight: 300;
+    color: var(--primary-color);
+    margin-top: 20px;
 }
 
 /* Селектор дней недели */
@@ -223,45 +312,6 @@ main {
 }
 
 /* Таймер */
-.timer-display {
-    margin-bottom: 20px;
-}
-
-.timer-inputs {
-    display: flex;
-    justify-content: space-around;
-    margin-bottom: 20px;
-}
-
-.timer-input-group {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.timer-input-group label {
-    margin-bottom: 5px;
-    color: var(--text-secondary);
-}
-
-.timer-input-group input {
-    width: 70px;
-    height: 70px;
-    font-size: 2rem;
-    text-align: center;
-    background: rgba(255, 255, 255, 0.1);
-    border: none;
-    border-radius: 10px;
-    color: white;
-}
-
-.timer-countdown {
-    font-size: 3rem;
-    text-align: center;
-    font-weight: 300;
-    color: var(--primary-color);
-}
-
 .timer-controls {
     display: flex;
     justify-content: center;

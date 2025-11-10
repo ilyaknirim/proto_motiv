@@ -5,6 +5,7 @@ let timerSeconds;
 let isPaused = false;
 let alarmDays = [];
 let alarmAudio;
+let scrollEndTimer;
 
 // DOM элементы
 const alarmTab = document.getElementById('alarm-tab');
@@ -59,12 +60,19 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Обработчики для ввода времени
-    document.getElementById('alarm-hours').addEventListener('change', saveSettings);
-    document.getElementById('alarm-minutes').addEventListener('change', saveSettings);
-    document.getElementById('timer-hours').addEventListener('change', updateTimerDisplay);
-    document.getElementById('timer-minutes').addEventListener('change', updateTimerDisplay);
-    document.getElementById('timer-seconds').addEventListener('change', updateTimerDisplay);
+    // Инициализация колес выбора времени
+    initTimePicker('hours-wheel');
+    initTimePicker('minutes-wheel');
+    initTimePicker('timer-hours-wheel');
+    initTimePicker('timer-minutes-wheel');
+    initTimePicker('timer-seconds-wheel');
+
+    // Установка начальных позиций для колес
+    scrollToSelected('hours-wheel');
+    scrollToSelected('minutes-wheel');
+    scrollToSelected('timer-hours-wheel');
+    scrollToSelected('timer-minutes-wheel');
+    scrollToSelected('timer-seconds-wheel');
 
     // Инициализация отображения таймера
     updateTimerDisplay();
@@ -96,8 +104,8 @@ function updateCurrentTime() {
 
 // Установка будильника
 function setAlarm() {
-    const hours = parseInt(document.getElementById('alarm-hours').value);
-    const minutes = parseInt(document.getElementById('alarm-minutes').value);
+    const hours = getSelectedTimeValue('hours-wheel');
+    const minutes = getSelectedTimeValue('minutes-wheel');
 
     if (isNaN(hours) || isNaN(minutes) || hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
         alarmStatusText.textContent = 'Пожалуйста, введите корректное время';
@@ -200,9 +208,9 @@ function startTimer() {
         isPaused = false;
     } else {
         // Запускаем новый таймер
-        const hours = parseInt(document.getElementById('timer-hours').value) || 0;
-        const minutes = parseInt(document.getElementById('timer-minutes').value) || 0;
-        const seconds = parseInt(document.getElementById('timer-seconds').value) || 0;
+        const hours = getSelectedTimeValue('timer-hours-wheel') || 0;
+        const minutes = getSelectedTimeValue('timer-minutes-wheel') || 0;
+        const seconds = getSelectedTimeValue('timer-seconds-wheel') || 0;
 
         timerSeconds = hours * 3600 + minutes * 60 + seconds;
 
@@ -261,9 +269,9 @@ function resetTimer() {
 
 // Обновление отображения таймера
 function updateTimerDisplay() {
-    const hours = parseInt(document.getElementById('timer-hours').value) || 0;
-    const minutes = parseInt(document.getElementById('timer-minutes').value) || 0;
-    const seconds = parseInt(document.getElementById('timer-seconds').value) || 0;
+    const hours = getSelectedTimeValue('timer-hours-wheel') || 0;
+    const minutes = getSelectedTimeValue('timer-minutes-wheel') || 0;
+    const seconds = getSelectedTimeValue('timer-seconds-wheel') || 0;
 
     const h = String(hours).padStart(2, '0');
     const m = String(minutes).padStart(2, '0');
@@ -283,6 +291,152 @@ function updateTimerDisplayFromSeconds() {
     const s = String(seconds).padStart(2, '0');
 
     timerDisplay.textContent = `${h}:${m}:${s}`;
+}
+
+// Инициализация колеса выбора времени
+function initTimePicker(wheelId) {
+    const wheel = document.getElementById(wheelId);
+    let isScrolling = false;
+    let startY = 0;
+    let startScrollTop = 0;
+
+    // Обработчик клика на элемент
+    wheel.addEventListener('click', (e) => {
+        if (e.target.classList.contains('time-picker-item')) {
+            selectTimeItem(wheelId, e.target);
+        }
+    });
+
+    // Обработчики для прокрутки
+    wheel.addEventListener('scroll', () => {
+        if (!isScrolling) {
+            // Определяем ближайший к центру элемент при остановке прокрутки
+            window.clearTimeout(scrollEndTimer);
+            scrollEndTimer = window.setTimeout(() => {
+                snapToClosest(wheelId);
+            }, 100);
+        }
+    });
+
+    // Обработчики для свайпа на мобильных устройствах
+    wheel.addEventListener('touchstart', (e) => {
+        isScrolling = true;
+        startY = e.touches[0].clientY;
+        startScrollTop = wheel.scrollTop;
+    }, { passive: true });
+
+    wheel.addEventListener('touchmove', (e) => {
+        if (!isScrolling) return;
+
+        const y = e.touches[0].clientY;
+        const walk = (startY - y) * 2;
+        wheel.scrollTop = startScrollTop + walk;
+    }, { passive: true });
+
+    wheel.addEventListener('touchend', () => {
+        isScrolling = false;
+        snapToClosest(wheelId);
+    });
+}
+
+// Выбор элемента времени
+function selectTimeItem(wheelId, item) {
+    // Удаляем класс selected у всех элементов
+    const wheel = document.getElementById(wheelId);
+    const items = wheel.querySelectorAll('.time-picker-item');
+    items.forEach(el => el.classList.remove('selected'));
+
+    // Добавляем класс selected выбранному элементу
+    item.classList.add('selected');
+
+    // Прокручиваем к выбранному элементу
+    scrollToItem(wheelId, item);
+
+    // Обновляем отображение таймера, если это таймер
+    if (wheelId.includes('timer')) {
+        updateTimerDisplay();
+    }
+
+    // Сохраняем настройки, если это будильник
+    if (wheelId === 'hours-wheel' || wheelId === 'minutes-wheel') {
+        saveSettings();
+    }
+}
+
+// Прокрутка к выбранному элементу
+function scrollToItem(wheelId, item) {
+    const wheel = document.getElementById(wheelId);
+    const wheelRect = wheel.getBoundingClientRect();
+    const itemRect = item.getBoundingClientRect();
+
+    // Вычисляем позицию для центрирования элемента
+    const itemCenter = itemRect.top + itemRect.height / 2;
+    const wheelCenter = wheelRect.top + wheelRect.height / 2;
+    const scrollTop = wheel.scrollTop + (itemCenter - wheelCenter);
+
+    wheel.scrollTo({
+        top: scrollTop,
+        behavior: 'smooth'
+    });
+}
+
+// Прокрутка к выбранному элементу при инициализации
+function scrollToSelected(wheelId) {
+    const wheel = document.getElementById(wheelId);
+    const selectedItem = wheel.querySelector('.time-picker-item.selected');
+
+    if (selectedItem) {
+        // Центрируем выбранный элемент
+        const itemHeight = selectedItem.offsetHeight;
+        const wheelHeight = wheel.offsetHeight;
+        const itemsCount = wheel.querySelectorAll('.time-picker-item').length;
+        const selectedIndex = Array.from(wheel.querySelectorAll('.time-picker-item')).indexOf(selectedItem);
+
+        // Вычисляем позицию прокрутки
+        const scrollTop = selectedIndex * itemHeight - (wheelHeight / 2) + (itemHeight / 2);
+
+        wheel.scrollTop = scrollTop;
+    }
+}
+
+// Привязка к ближайшему элементу при остановке прокрутки
+function snapToClosest(wheelId) {
+    const wheel = document.getElementById(wheelId);
+    const itemHeight = wheel.querySelector('.time-picker-item').offsetHeight;
+    const scrollTop = wheel.scrollTop;
+    const center = scrollTop + wheel.offsetHeight / 2;
+
+    // Находим ближайший к центру элемент
+    const items = wheel.querySelectorAll('.time-picker-item');
+    let closestItem = null;
+    let closestDistance = Infinity;
+
+    items.forEach(item => {
+        const itemTop = item.offsetTop;
+        const itemCenter = itemTop + itemHeight / 2;
+        const distance = Math.abs(center - itemCenter);
+
+        if (distance < closestDistance) {
+            closestDistance = distance;
+            closestItem = item;
+        }
+    });
+
+    if (closestItem) {
+        selectTimeItem(wheelId, closestItem);
+    }
+}
+
+// Получение выбранного значения времени
+function getSelectedTimeValue(wheelId) {
+    const wheel = document.getElementById(wheelId);
+    const selectedItem = wheel.querySelector('.time-picker-item.selected');
+
+    if (selectedItem) {
+        return parseInt(selectedItem.dataset.value);
+    }
+
+    return 0;
 }
 
 // Срабатывание будильника
