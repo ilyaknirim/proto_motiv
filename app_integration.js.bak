@@ -1,13 +1,16 @@
 
-// Enhanced app_integration.js - snooze, countdown, streaks, fade controls, PWA friendly
+// Improved app_integration.js
+// - fetches audio_manifest.json via fetch (works on file:// only with server; recommended to use http-server)
+// - creates a single AudioContext on first user gesture
+// - routes <audio> elements through AudioContext GainNode for fade-in/fade-out control
+// - ensures initMelodyGenerator() is called if available
 
 let manifest = null;
+let audioCache = new Map();
 let mediaNodes = new Map(); // filename -> {audio, source, gain}
 let alarmTimer = null;
 let audioContext = null;
 let userInteracted = false;
-let countdownInterval = null;
-let scheduledTarget = null;
 
 async function loadManifest(){
   try {
@@ -35,12 +38,14 @@ function onFirstUserGesture(){
   if (userInteracted) return;
   userInteracted = true;
   ensureAudioContext();
+  // resume if suspended
   if (audioContext && audioContext.state === 'suspended') {
     audioContext.resume().catch(()=>{});
   }
 }
 
 function createMediaNode(filename){
+  // create <audio> and connect to AudioContext gain for fade control
   const audio = new Audio('./audio/' + encodeURIComponent(filename));
   audio.preload = 'auto';
   audio.crossOrigin = 'anonymous';
@@ -68,23 +73,20 @@ async function playAudioWithFade(filename, targetVol=0.8, fadeInSec=1.2){
   let info = mediaNodes.get(filename);
   if (!info) info = createMediaNode(filename);
   const audio = info.audio;
+  // ensure loaded
   await new Promise(resolve => {
     if (audio.readyState >= 3) return resolve();
     const t = setTimeout(()=> resolve(), 2500);
     audio.addEventListener('canplay', ()=>{ clearTimeout(t); resolve(); }, {once:true});
     audio.addEventListener('error', ()=>{ clearTimeout(t); resolve(); }, {once:true});
   });
+  // stop/reset
   try { audio.pause(); audio.currentTime = 0; } catch(e){}
   if (info.gain && audioContext){
     const now = audioContext.currentTime;
     info.gain.gain.cancelScheduledValues(now);
-    try {
-      info.gain.gain.setValueAtTime(0.0001, now);
-      info.gain.gain.exponentialRampToValueAtTime(Math.max(0.0001, targetVol), now + Math.max(0.01, fadeInSec));
-    } catch(e){
-      // some browsers don't like exponential from 0
-      info.gain.gain.linearRampToValueAtTime(targetVol, now + Math.max(0.01, fadeInSec));
-    }
+    info.gain.gain.setValueAtTime(0.0001, now); // start very low to avoid clicks
+    info.gain.gain.exponentialRampToValueAtTime(Math.max(0.0001, targetVol), now + Math.max(0.01, fadeInSec));
   } else {
     try { audio.volume = targetVol; } catch(e){}
   }
@@ -93,32 +95,26 @@ async function playAudioWithFade(filename, targetVol=0.8, fadeInSec=1.2){
   return audio;
 }
 
-function fadeOutAndPause(info, fadeOutSec=0.6){
-  if (!info) return;
-  const audio = info.audio;
-  if (info.gain && audioContext){
-    const now = audioContext.currentTime;
-    try {
-      info.gain.gain.cancelScheduledValues(now);
-      info.gain.gain.setValueAtTime(info.gain.gain.value || 1, now);
-      info.gain.gain.exponentialRampToValueAtTime(0.0001, now + Math.max(0.01, fadeOutSec));
-    } catch(e){
-      info.gain.gain.linearRampToValueAtTime(0, now + Math.max(0.01, fadeOutSec));
-    }
-    setTimeout(()=>{ try{ audio.pause(); audio.currentTime=0; }catch(e){} }, Math.ceil((fadeOutSec+0.05)*1000));
-  } else {
-    try { audio.pause(); audio.currentTime = 0; } catch(e){}
-  }
-}
-
 function stopAllAudio(fadeOutSec=0.6){
-  for (const info of mediaNodes.values()){
-    try { fadeOutAndPause(info, fadeOutSec); } catch(e){}
+  for (const [name, info] of mediaNodes.entries()){
+    try {
+      if (info.gain && audioContext){
+        const now = audioContext.currentTime;
+        info.gain.gain.cancelScheduledValues(now);
+        info.gain.gain.setValueAtTime(info.gain.gain.value || 1, now);
+        info.gain.gain.exponentialRampToValueAtTime(0.0001, now + Math.max(0.01, fadeOutSec));
+        // schedule pause after fade
+        setTimeout(()=>{ try{ info.audio.pause(); info.audio.currentTime = 0;}catch(e){} }, Math.ceil((fadeOutSec+0.1)*1000));
+      } else {
+        info.audio.pause();
+        info.audio.currentTime = 0;
+      }
+    } catch(e){ console.warn(e); }
   }
   if (typeof natureSoundsGenerator !== 'undefined' && natureSoundsGenerator && natureSoundsGenerator.stop) {
     try{ natureSoundsGenerator.stop(); }catch(e){}
   }
-  if (alarmTimer){ clearTimeout(alarmTimer); alarmTimer = null; scheduledTarget = null; updateCountdownDisplay(); }
+  if (alarmTimer){ clearTimeout(alarmTimer); alarmTimer = null; }
 }
 
 function renderList(){
@@ -151,56 +147,21 @@ function renderList(){
   }
 }
 
-// countdown / UI helpers
-function formatTimeLeft(ms){
-  if (!ms || ms <= 0) return '00:00:00';
-  const s = Math.floor(ms/1000);
-  const hh = String(Math.floor(s/3600)).padStart(2,'0');
-  const mm = String(Math.floor((s%3600)/60)).padStart(2,'0');
-  const ss = String(s%60).padStart(2,'0');
-  return hh+':'+mm+':'+ss;
-}
-function updateCountdownDisplay(){
-  const el = document.getElementById('countdown');
-  if (!scheduledTarget) { el.textContent = 'Будильник не установлен'; document.getElementById('snooze').disabled = true; return; }
-  const now = new Date();
-  const ms = scheduledTarget - now;
-  if (ms <= 0) {
-    el.textContent = 'Будильник сработил';
-    document.getElementById('snooze').disabled = false;
-    return;
-  }
-  el.textContent = 'До будильника: ' + formatTimeLeft(ms);
-  document.getElementById('snooze').disabled = false;
-}
-
-function scheduleCountdown(){
-  if (countdownInterval) clearInterval(countdownInterval);
-  countdownInterval = setInterval(updateCountdownDisplay, 1000);
-  updateCountdownDisplay();
-}
-
-// streaks using localStorage
-function getStreak(){ return Number(localStorage.getItem('motiv_streak') || 0); }
-function setStreak(n){ localStorage.setItem('motiv_streak', String(n)); document.getElementById('streakCount').textContent = String(n); }
-function incrementStreak(){ setStreak(getStreak()+1); }
-
 function setWakeUp(timeStr){
-  if (alarmTimer){ clearTimeout(alarmTimer); alarmTimer = null; scheduledTarget = null; }
+  if (alarmTimer){ clearTimeout(alarmTimer); alarmTimer = null; }
   const now = new Date();
   const [hh, mm] = timeStr.split(':').map(Number);
   const target = new Date(now);
   target.setHours(hh, mm, 0, 0);
   if (target <= now) target.setDate(target.getDate() + 1);
   const ms = target - now;
-  scheduledTarget = target;
-  scheduleCountdown();
+  console.log('Alarm set for', target.toString(), 'in', ms, 'ms');
   alarmTimer = setTimeout(async ()=>{
     try {
       const vol = Number(document.getElementById('volume').value) || 0.8;
       // 1) soft track
       const soft = (manifest && manifest.audio && manifest.audio.length) ? manifest.audio[0] : null;
-      if (soft) await playAudioWithFade(soft, Math.min(0.35, vol*0.45), 2.8);
+      if (soft) await playAudioWithFade(soft, Math.min(0.35, vol*0.45), 2.5);
       // 2) after 18s start nature generator (if available)
       setTimeout(()=>{
         try {
@@ -209,65 +170,27 @@ function setWakeUp(timeStr){
           }
         } catch(e){ console.error(e); }
       }, 18000);
-      // 3) before playing motivational clip, fade out generator smoothly
-      setTimeout(async ()=>{
-        try {
-          if (typeof natureSoundsGenerator !== 'undefined' && natureSoundsGenerator && natureSoundsGenerator.fadeOutAndStop){
-            // if generator provides fadeOutAndStop API
-            try { natureSoundsGenerator.fadeOutAndStop(2.0); } catch(e){ natureSoundsGenerator.stop(); }
-          } else if (typeof natureSoundsGenerator !== 'undefined' && natureSoundsGenerator && natureSoundsGenerator.stop){
-            // best-effort stop with slight delay
-            try { natureSoundsGenerator.stop(); } catch(e) {}
-          }
-        } catch(e){ console.error(e); }
-      }, 32000);
-      // 4) after 35s play motivational clip
+      // 3) after 35s play motivational clip
       setTimeout(async ()=>{
         const idx = Math.floor(Math.random()*(manifest && manifest.audio ? manifest.audio.length : 1));
         const file = manifest.audio[idx];
         await playAudioWithFade(file, Math.min(1, vol), 1.2);
       }, 35000);
-      // mark scheduledTarget as fired
-      scheduledTarget = null;
-      updateCountdownDisplay();
     } catch(e){ console.error(e); }
     alarmTimer = null;
   }, ms);
   alert('Будильник установлен на '+ target.toLocaleString());
-  scheduleCountdown();
 }
 
-// snooze +5 minutes
-function snoozeFive(){
-  if (!scheduledTarget && !alarmTimer) {
-    alert('Будильник не установлен');
-    return;
-  }
-  // cancel current audio and generator
-  stopAllAudio(0.6);
-  const now = new Date();
-  const newTarget = new Date(now.getTime() + 5*60*1000);
-  const hh = String(newTarget.getHours()).padStart(2,'0');
-  const mm = String(newTarget.getMinutes()).padStart(2,'0');
-  setWakeUp(hh + ':' + mm);
-  alert('Будильник отложен на 5 минут');
-}
-
-// I'm awake button: stop everything and increment streak
-function imAwake(){
-  stopAllAudio(0.6);
-  incrementStreak();
-  alert('Отлично! Серия увеличена.');
-}
-
-// register UI events and init
+// Attach event listeners and initialization
 document.addEventListener('DOMContentLoaded', async ()=>{
+  // listen for first user interaction to unlock audio
   ['click','keydown','touchstart'].forEach(evt => document.addEventListener(evt, onFirstUserGesture, {once:true}));
+
   await loadManifest();
   renderList();
-  // init streak display
-  document.getElementById('streakCount').textContent = String(getStreak());
 
+  // try to init generator if available
   try {
     if (typeof initMelodyGenerator === 'function') {
       initMelodyGenerator();
@@ -292,9 +215,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   });
   document.getElementById('genStop').addEventListener('click', ()=>{
     if (typeof natureSoundsGenerator !== 'undefined' && natureSoundsGenerator && natureSoundsGenerator.stop) {
-      try { natureSoundsGenerator.stop(); } catch(e) {}
+      natureSoundsGenerator.stop();
     }
   });
-  document.getElementById('snooze').addEventListener('click', snoozeFive);
-  document.getElementById('imAwake').addEventListener('click', imAwake);
 });

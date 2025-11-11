@@ -3,10 +3,15 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Motiv v2 — Полная версия</title>
+<title>Motiv — Просыпайся с желанием</title>
 <link rel="stylesheet" href="styles_refactor.css">
+<link rel="manifest" href="manifest.json">
+  <link rel="icon" href="favicon.ico">
+    <link rel="stylesheet" href="styles_additions.css">
 </head>
 <body>
+  <div id="toast-root" aria-live="polite" style="position:fixed;top:18px;right:18px;z-index:9999;"></div>
+  <div id="sunrise" class="sunrise"></div>
   <main class="container">
     <header>
       <h1>Motiv — Просыпайся с желанием</h1>
@@ -24,6 +29,24 @@
       </label>
       <button id="setWake">Установить будильник</button>
       <button id="stopAll" class="secondary">Остановить всё</button>
+    </section>
+
+    <section class="status">
+      <div class="status-left">
+        <div id="countdown" class="countdown">Будильник не установлен</div>
+        <div class="streak">Текущая серия: <span id="streakCount">0</span> дней</div>
+      </div>
+      <div class="status-right">
+        <label class="snooze-label">Отложить
+          <select id="snoozeSelect">
+            <option value="5">+5 мин</option>
+            <option value="10">+10 мин</option>
+            <option value="15">+15 мин</option>
+          </select>
+        </label>
+        <button id="snooze" class="secondary">Отложить</button>
+        <button id="imAwake">Я проснулся</button>
+      </div>
     </section>
 
     <section class="generator">
@@ -45,12 +68,24 @@
       <div id="audioList" class="audio-list"></div>
     </section>
 
+    <section class="stats">
+      <h3>Статистика — последние 7 дней</h3>
+      <canvas id="statsCanvas" width="700" height="120"></canvas>
+      <p class="small">Зелёный — вовремя, жёлтый — отложил, красный — пропущено.</p>
+    </section>
+
     <footer>
-      <small>Полная сборка: все аудиофайлы включены.</small>
+      <small>Полная сборка: все аудиофайлы включены. PWA-ready (установите приложение на устройство).</small>
     </footer>
   </main>
 
 <script src="melody_generator/integration.js"></script>
-<script type="module" src="app_integration.js"></script>
+<script type="module" src="app_integration_v3_plus.js"></script>
+<script>
+  // register service worker if available
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(()=>{/* ignore */});
+  }
+</script>
 </body>
 </html>

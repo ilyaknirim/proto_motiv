@@ -1,0 +1,22 @@
+{
+  "name": "Motiv Sunrise",
+  "short_name": "Motiv Sunrise",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#061022",
+  "theme_color": "#7c3aed",
+  "icons": [
+    {
+      "src": "icon_sunrise.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "maskable_icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
