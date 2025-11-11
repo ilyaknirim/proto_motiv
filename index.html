@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Motiv Sunrise — Просыпайся с желанием</title>
 <link rel="stylesheet" href="styles_optimized.css">
+<link rel="stylesheet" href="styles_additions.css">
 <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="favicon.ico">
+<link rel="icon" href="favicon.ico">
 </head>
 <body>
   <div id="toast-root" aria-live="polite" style="position:fixed;top:18px;right:18px;z-index:9999;"></div>
@@ -38,6 +39,45 @@
 
       <div id="timersList" class="timers-list">
         <!-- Default timer will be added here -->
+      </div>
+
+      <!-- Timer Sound Settings Panel -->
+      <div id="timerSoundSettings" class="timer-sound-settings" style="display: none;">
+        <h3>Настройки звука таймера</h3>
+        <div class="settings-grid">
+          <div class="setting-item">
+            <label for="timerMelodyType">Тип мелодии</label>
+            <select id="timerMelodyType">
+              <option value="calm">Спокойная</option>
+              <option value="gentle">Нежная</option>
+              <option value="peaceful">Мирная</option>
+              <option value="nature">Звуки природы</option>
+            </select>
+          </div>
+          <div class="setting-item">
+            <label for="timerFadeInTime">Время нарастания</label>
+            <select id="timerFadeInTime">
+              <option value="10">10 сек</option>
+              <option value="20">20 сек</option>
+              <option value="30">30 сек</option>
+              <option value="60">1 мин</option>
+            </select>
+          </div>
+          <div class="setting-item">
+            <label for="timerStartVolume">Начальная громкость</label>
+            <input type="range" id="timerStartVolume" min="0.1" max="1" step="0.1" value="0.2">
+            <span id="timerStartVolumeValue">0.2</span>
+          </div>
+          <div class="setting-item">
+            <label for="timerMaxVolume">Максимальная громкость</label>
+            <input type="range" id="timerMaxVolume" min="0.1" max="1" step="0.1" value="0.9">
+            <span id="timerMaxVolumeValue">0.9</span>
+          </div>
+        </div>
+        <div class="settings-actions">
+          <button id="applyTimerSettings" class="primary">Применить</button>
+          <button id="resetTimerSettings" class="secondary">Сбросить</button>
+        </div>
       </div>
     </section>
 
