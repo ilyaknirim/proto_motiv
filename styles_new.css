@@ -1,0 +1,639 @@
+
+/* Основные переменные и стили */
+:root {
+  --primary-color: #6366f1;
+  --primary-dark: #4f46e5;
+  --secondary-color: #06b6d4;
+  --background-color: #0f172a;
+  --surface-color: #1e293b;
+  --card-color: #334155;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+  --error-color: #ef4444;
+  --border-radius: 12px;
+  --transition: all 0.3s ease;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-primary);
+  line-height: 1.5;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Заголовок приложения */
+.app-header {
+  padding: 20px 16px;
+  background-color: var(--surface-color);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.app-header h1 {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: var(--text-primary);
+}
+
+.tab-navigation {
+  display: flex;
+  gap: 8px;
+}
+
+.tab-button {
+  flex: 1;
+  padding: 12px 16px;
+  background-color: transparent;
+  border: none;
+  border-radius: var(--border-radius);
+  color: var(--text-secondary);
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.tab-button.active {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.tab-button:hover:not(.active) {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Основной контент */
+.app-content {
+  flex: 1;
+  padding: 16px;
+  padding-bottom: 80px;
+  position: relative;
+}
+
+.content-section {
+  display: none;
+}
+
+.content-section.active {
+  display: block;
+}
+
+/* Кнопка добавления */
+.add-button-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 50;
+}
+
+.fab-button {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: var(--primary-color);
+  border: none;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  transition: var(--transition);
+}
+
+.fab-button:hover {
+  background-color: var(--primary-dark);
+  transform: scale(1.05);
+}
+
+/* Списки элементов */
+.items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.item-card {
+  background-color: var(--surface-color);
+  border-radius: var(--border-radius);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: var(--transition);
+}
+
+.item-card:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.item-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.item-time {
+  font-size: 32px;
+  font-weight: 300;
+  letter-spacing: 1px;
+}
+
+.item-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.item-label {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.item-subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.item-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Переключатель */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 28px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: var(--transition);
+  border-radius: 28px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: var(--transition);
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: var(--primary-color);
+}
+
+input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+/* Настройки */
+.settings-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.settings-group {
+  background-color: var(--surface-color);
+  border-radius: var(--border-radius);
+  padding: 16px;
+}
+
+.settings-group h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: var(--text-primary);
+}
+
+.setting-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.setting-item:last-child {
+  border-bottom: none;
+}
+
+.setting-item label {
+  font-size: 16px;
+  color: var(--text-primary);
+}
+
+.setting-item input[type="range"] {
+  width: 120px;
+}
+
+.setting-item select {
+  padding: 8px 12px;
+  border-radius: 6px;
+  background-color: var(--card-color);
+  color: var(--text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Статистика */
+.stats-container {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 16px;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 32px;
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.stat-label {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+#statsChart {
+  width: 100%;
+  height: 150px;
+  margin-top: 16px;
+}
+
+/* Модальные окна */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal.show {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background-color: var(--surface-color);
+  border-radius: var(--border-radius);
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideUp 0.3s ease;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-header h2 {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Формы */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 16px;
+  color: var(--text-primary);
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 12px;
+  border-radius: 6px;
+  background-color: var(--card-color);
+  color: var(--text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 16px;
+}
+
+/* Выбор времени */
+.time-picker {
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: center;
+}
+
+.time-input-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 48px;
+  font-weight: 300;
+}
+
+.time-input-group input {
+  width: 80px;
+  height: 80px;
+  text-align: center;
+  font-size: 48px;
+  font-weight: 300;
+  background-color: var(--card-color);
+  border: none;
+  border-radius: 8px;
+  color: var(--text-primary);
+}
+
+.time-input-group span {
+  color: var(--text-secondary);
+}
+
+/* Дни недели */
+.weekdays {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 16px;
+}
+
+.weekday {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background-color: transparent;
+  color: var(--text-secondary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.weekday.active {
+  background-color: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+/* Кнопки действий */
+.action-button {
+  padding: 12px 24px;
+  border-radius: 6px;
+  border: none;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.action-button.primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.action-button.secondary {
+  background-color: transparent;
+  color: var(--text-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.action-button:hover {
+  opacity: 0.8;
+}
+
+/* Переключатель с меткой */
+.switch-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+/* Анимации */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Уведомления */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 2000;
+}
+
+.toast {
+  background-color: var(--surface-color);
+  color: var(--text-primary);
+  padding: 16px 20px;
+  border-radius: var(--border-radius);
+  margin-bottom: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: slideInRight 0.3s ease;
+  max-width: 300px;
+}
+
+.toast.success {
+  border-left: 4px solid var(--success-color);
+}
+
+.toast.warning {
+  border-left: 4px solid var(--warning-color);
+}
+
+.toast.error {
+  border-left: 4px solid var(--error-color);
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* Адаптивность */
+@media (max-width: 480px) {
+  .app-header {
+    padding: 16px 12px;
+  }
+
+  .app-content {
+    padding: 12px;
+  }
+
+  .time-input-group input {
+    width: 60px;
+    height: 60px;
+    font-size: 36px;
+  }
+
+  .modal-content {
+    width: 95%;
+  }
+}
+
+/* Анимация рассвета */
+.sunrise {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(ellipse at bottom, #ffb347 0%, #ffcc33 40%, #1e3c72 100%);
+  opacity: 0;
+  pointer-events: none;
+  z-index: -1;
+  transition: opacity 2s ease;
+}
+
+.sunrise.animate {
+  opacity: 0.3;
+  animation: sunrise 30s forwards;
+}
+
+@keyframes sunrise {
+  0% {
+    opacity: 0.3;
+    background: radial-gradient(ellipse at bottom, #ffb347 0%, #ffcc33 40%, #1e3c72 100%);
+  }
+  50% {
+    opacity: 0.5;
+    background: radial-gradient(ellipse at bottom, #ff9a56 0%, #ffcc33 40%, #1e3c72 100%);
+  }
+  100% {
+    opacity: 0.7;
+    background: radial-gradient(ellipse at bottom, #ff7e5f 0%, #feb47b 40%, #1e3c72 100%);
+  }
+}
+
+/* Экран сработавшего будильника */
+.alarm-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--surface-color);
+  z-index: 3000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.5s ease;
+}
+
+.alarm-time {
+  font-size: 72px;
+  font-weight: 200;
+  margin-bottom: 16px;
+}
+
+.alarm-label {
+  font-size: 24px;
+  margin-bottom: 40px;
+  color: var(--text-secondary);
+}
+
+.alarm-actions {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.alarm-action-button {
+  flex: 1;
+  padding: 16px;
+  border-radius: var(--border-radius);
+  border: none;
+  font-size: 18px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.stop-button {
+  background-color: var(--success-color);
+  color: white;
+}
+
+.snooze-button {
+  background-color: var(--warning-color);
+  color: white;
+}
