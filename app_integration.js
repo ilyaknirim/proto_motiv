@@ -285,6 +285,45 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   document.getElementById('stopAll').addEventListener('click', ()=>{
     stopAllAudio();
   });
+  // Settings toggle functionality
+  const settingsBtn = document.getElementById('settingsBtn');
+  const soundSettings = document.getElementById('soundSettings');
+
+  settingsBtn.addEventListener('click', () => {
+    soundSettings.classList.toggle('hidden');
+    settingsBtn.classList.toggle('active');
+  });
+
+  // Volume display updates
+  const volumeInput = document.getElementById('volume');
+  const volumeValue = document.getElementById('volumeValue');
+
+  volumeInput.addEventListener('input', () => {
+    const value = Math.round(volumeInput.value * 100);
+    volumeValue.textContent = value + '%';
+  });
+
+  // Settings volume displays
+  const startVolumeInput = document.getElementById('startVolume');
+  const startVolumeValue = document.getElementById('startVolumeValue');
+  const maxVolumeInput = document.getElementById('maxVolume');
+  const maxVolumeValue = document.getElementById('maxVolumeValue');
+
+  startVolumeInput.addEventListener('input', () => {
+    const value = Math.round(startVolumeInput.value * 100);
+    startVolumeValue.textContent = value + '%';
+  });
+
+  maxVolumeInput.addEventListener('input', () => {
+    const value = Math.round(maxVolumeInput.value * 100);
+    maxVolumeValue.textContent = value + '%';
+  });
+
+  // Initialize volume displays
+  volumeValue.textContent = Math.round(volumeInput.value * 100) + '%';
+  startVolumeValue.textContent = Math.round(startVolumeInput.value * 100) + '%';
+  maxVolumeValue.textContent = Math.round(maxVolumeInput.value * 100) + '%';
+
   document.getElementById('genPlay').addEventListener('click', ()=>{
     const mood = document.getElementById('moodSelect').value || 'calm';
     if (typeof melodyGenerator !== 'undefined' && melodyGenerator && melodyGenerator.generateAndPlay) {

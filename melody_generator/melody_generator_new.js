@@ -30,9 +30,11 @@ class MelodyGenerator {
     /**
      * Генерирует и воспроизводит спокойную, нарастающую мелодию
      * @param {Object} options - опции генерации
-     * @param {string} options.mood - настроение ('calm', 'gentle', 'peaceful')
+     * @param {string} options.mood - настроение ('calm', 'gentle', 'peaceful', 'nature')
      * @param {number} options.duration - длительность в секундах
      * @param {number} options.fadeInTime - время нарастания в секундах
+     * @param {number} options.startVolume - начальная громкость (0-1)
+     * @param {number} options.maxVolume - максимальная громкость (0-1)
      */
     async generateAndPlay(options = {}) {
         if (!this.audioContext) {
@@ -43,11 +45,19 @@ class MelodyGenerator {
         // Останавливаем предыдущее воспроизведение
         this.stop();
 
-        // Устанавливаем опции по умолчанию
+        // Получаем настройки из UI или используем опции по умолчанию
+        const getSetting = (id, defaultValue) => {
+            const element = document.getElementById(id);
+            return element ? element.value : defaultValue;
+        };
+
+        // Устанавливаем опции по умолчанию или из настроек
         const opts = {
-            mood: options.mood || 'calm',
-            duration: options.duration || 180, // 3 минуты по умолчанию
-            fadeInTime: options.fadeInTime || 60, // 1 минута на нарастание
+            mood: options.mood || getSetting('melodyType', 'calm'),
+            duration: options.duration || parseInt(getSetting('alarmDuration', '180')),
+            fadeInTime: options.fadeInTime || parseInt(getSetting('fadeInTime', '60')),
+            startVolume: options.startVolume || parseFloat(getSetting('startVolume', '0.1')),
+            maxVolume: options.maxVolume || parseFloat(getSetting('maxVolume', '0.8')),
             ...options
         };
 
@@ -131,20 +141,24 @@ class MelodyGenerator {
 
                 // Вычисляем громкость с постепенным нарастанием
                 const timeProgress = currentTime / totalDuration;
-                let volume = 0.1; // Начинаем тихо
+                const startVolume = options.startVolume || 0.1;
+                const maxVolume = options.maxVolume || 0.8;
+
+                let volume = startVolume; // Начинаем с заданной громкости
 
                 if (timeProgress > 0.1) { // После первых 10% времени
                     const fadeProgress = Math.min((timeProgress - 0.1) / 0.4, 1); // Нарастание в первые 40%
-                    volume = 0.1 + (fadeProgress * 0.4); // До 0.5 громкости
+                    volume = startVolume + (fadeProgress * (maxVolume - startVolume) * 0.6); // До 60% от диапазона
                 }
 
                 if (timeProgress > 0.5) { // После половины времени
                     const finalProgress = (timeProgress - 0.5) / 0.5;
-                    volume = 0.5 + (finalProgress * 0.3); // До 0.8 громкости
+                    volume = startVolume + ((maxVolume - startVolume) * 0.6) + (finalProgress * (maxVolume - startVolume) * 0.4); // До максимума
                 }
 
                 // Добавляем небольшую вариацию громкости для естественности
                 volume *= (0.8 + Math.random() * 0.4);
+                volume = Math.min(volume, maxVolume); // Не превышаем максимум
 
                 notes.push({
                     pitch: patternNote.pitch,
