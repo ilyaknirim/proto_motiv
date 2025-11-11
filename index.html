@@ -3,19 +3,18 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Motiv — Просыпайся с желанием</title>
-<link rel="stylesheet" href="styles_refactor.css">
+<title>Motiv Sunrise — Просыпайся с желанием</title>
+<link rel="stylesheet" href="styles_optimized.css">
 <link rel="manifest" href="manifest.json">
   <link rel="icon" href="favicon.ico">
-    <link rel="stylesheet" href="styles_additions.css">
 </head>
 <body>
   <div id="toast-root" aria-live="polite" style="position:fixed;top:18px;right:18px;z-index:9999;"></div>
   <div id="sunrise" class="sunrise"></div>
   <main class="container">
     <header>
-      <h1>Motiv — Просыпайся с желанием</h1>
-      <p class="tagline">Полная сборка — генератор мелодий + коллекция мотиваций</p>
+      <h1>Motiv Sunrise — Просыпайся с желанием</h1>
+      <p class="tagline">Будильники, таймеры и генератор мелодий для комфортного пробуждения</p>
     </header>
 
     <!-- Alarm Clock Section -->
@@ -91,12 +90,12 @@
     </section>
 
     <footer>
-      <small>Полная сборка: все аудиофайлы включены. PWA-ready (установите приложение на устройство).</small>
+      <small>Motiv Sunrise v2.0 — оптимизированная версия. PWA-ready (установите приложение на устройство).</small>
     </footer>
   </main>
 
 <script src="melody_generator/integration.js"></script>
-<script type="module" src="app_integration_v3_plus.js"></script>
+<script src="app_optimized.js"></script>
 <script>
   // register service worker if available
   if ('serviceWorker' in navigator) {

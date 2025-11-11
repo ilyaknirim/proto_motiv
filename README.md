@@ -1,12 +1,33 @@
-# Motiv Sunrise — Site Ready
+# Motiv Sunrise v2.0 — Оптимизированное приложение для комфортного пробуждения
 
-This folder is ready to deploy as a static site (GitHub Pages, Netlify, Vercel).
+Motiv Sunrise — это Progressive Web App (PWA) для управления будильниками и таймерами с уникальной функцией генерации спокойных мелодий для пробуждения.
 
-## Quick start
+## Особенности
 
-1. Serve locally: `python -m http.server 8000` and open `http://localhost:8000`.
-2. To publish on GitHub Pages: create a repository, push contents of this folder to `gh-pages` branch or use `site/` as publish dir.
+- Множественные будильники и таймеры с настраиваемыми параметрами
+- Генератор спокойных, нарастающих мелодий для комфортного пробуждения
+- Статистика пробуждений за последние 7 дней
+- Анимация восхода солнца при срабатывании будильника
+- Офлайн-работа благодаря Service Worker
+- Адаптивный дизайн для всех устройств
+- Возможность установки на устройство как нативное приложение
+
+## Быстрый старт
+
+1. Запуск локально: `python -m http.server 8000` и откройте `http://localhost:8000`.
+2. Для публикации на GitHub Pages: создайте репозиторий, отправьте содержимое этой папки в ветку `gh-pages` или используйте `site/` как директорию для публикации.
+
+## Структура проекта
+
+- `index.html` — основной HTML-файл приложения
+- `app_optimized.js` — объединенный JavaScript с логикой приложения
+- `styles_optimized.css` — объединенные стили приложения
+- `melody_generator/` — модули генератора мелодий
+- `audio/` — аудиофайлы с мотивациями
+- `audio_manifest.json` — манифест аудиофайлов
+- `manifest.json` — PWA-манифест
+- `sw.js` — Service Worker для офлайн-работы
 
 ## PWA
 
-The app includes a manifest and service worker. Install from mobile browsers to add to home screen.
+Приложение включает манифест и Service Worker. Установите с мобильных браузеров, чтобы добавить на главный экран.

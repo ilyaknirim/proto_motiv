@@ -1,12 +1,17 @@
 
-const CACHE_NAME = 'motiv-cache-v1';
+const CACHE_NAME = 'motiv-cache-v2';
 const ASSETS = [
   './icon_sunrise.png', './maskable_icon.png', './favicon.ico',
   './',
   './index.html',
-  './styles_refactor.css',
-  './app_integration.js',
-  './audio_manifest.json'
+  './styles_optimized.css',
+  './app_optimized.js',
+  './audio_manifest.json',
+  './melody_generator/integration.js',
+  './melody_generator/melody_generator_new.js',
+  './melody_generator/patterns.js',
+  './melody_generator/player.js',
+  './melody_generator/scales.js'
 ];
 // cache audio files lazily; do not pre-cache all mp3 to avoid large SW
 self.addEventListener('install', (e) => {
