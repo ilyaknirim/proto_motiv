@@ -1,23 +1,31 @@
 
 /**
- * Интеграция системы генерации звуков природы в основной проект
+ * Интеграция системы генерации мелодий в основной проект
  */
 
-// Глобальная переменная для генератора звуков природы
+// Глобальные переменные для генераторов
 let natureSoundsGenerator = null;
+let melodyGenerator = null;
 
 /**
- * Инициализация генератора звуков природы
+ * Инициализация генераторов мелодий
  */
-function initMelodyGenerator() {
+async function initMelodyGenerator() {
     // Проверяем поддержку Web Audio API
     if (!window.AudioContext && !window.webkitAudioContext) {
         console.error('Web Audio API не поддерживается в этом браузере');
         return;
     }
 
-    // Инициализируем генератор звуков природы
-    natureSoundsGenerator = new NatureSoundsGenerator();
+    try {
+        // Импортируем новый генератор мелодий
+        const { MelodyGenerator } = await import('./melody_generator_new.js');
+        melodyGenerator = new MelodyGenerator();
+    } catch (error) {
+        console.warn('Не удалось загрузить новый генератор мелодий, используем старый:', error);
+        // Fallback к старому генератору
+        natureSoundsGenerator = new NatureSoundsGenerator();
+    }
 
     // Заменяем функцию playRandomSound в основном скрипте
     if (typeof window.playRandomSound === 'function') {
@@ -25,37 +33,40 @@ function initMelodyGenerator() {
 
         window.playRandomSound = async function() {
             try {
-                // С вероятностью 70% воспроизводим звуки природы
-                if (natureSoundsGenerator && Math.random() > 0.3) {
-                    // Определяем тип среды в зависимости от времени суток
+                // Приоритет новому генератору мелодий
+                if (melodyGenerator) {
+                    // Генерируем спокойную мелодию для пробуждения
+                    await melodyGenerator.generateAndPlay({
+                        mood: 'calm',
+                        duration: 180, // 3 минуты
+                        fadeInTime: 60 // 1 минута на нарастание
+                    });
+                } else if (natureSoundsGenerator && Math.random() > 0.3) {
+                    // Fallback к звукам природы
                     const hour = new Date().getHours();
                     let environment;
 
                     if (hour >= 5 && hour < 9) {
-                        environment = 'morning'; // Раннее утро - звуки пробуждения природы
+                        environment = 'morning';
                     } else if (hour >= 9 && hour < 17) {
-                        environment = 'forest'; // День - звуки леса
+                        environment = 'forest';
                     } else if (hour >= 17 && hour < 21) {
-                        environment = 'ocean'; // Вечер - звуки океана
+                        environment = 'ocean';
                     } else {
-                        environment = 'rain'; // Ночь - звуки дождя
+                        environment = 'rain';
                     }
 
-                    // Генерируем и воспроизводим звуки природы (на фоне)
-                    natureSoundsGenerator.generateAndPlay({
+                    await natureSoundsGenerator.generateAndPlay({
                         environment: environment,
-                        duration: 120, // 2 минуты
-                        fadeInTime: 30 // 30 секунд на нарастание
-                    }).catch(error => {
-                        console.error('Ошибка при генерации звуков природы:', error);
+                        duration: 120,
+                        fadeInTime: 30
                     });
                 } else {
-                    // В остальных случаях воспроизводим оригинальный звук
+                    // Оригинальный звук
                     originalPlayRandomSound();
                 }
             } catch (error) {
                 console.error('Ошибка при воспроизведении:', error);
-                // В случае ошибки воспроизводим оригинальный звук
                 originalPlayRandomSound();
             }
         };
@@ -66,7 +77,10 @@ function initMelodyGenerator() {
         const originalStopNotification = window.stopNotification;
 
         window.stopNotification = function() {
-            // Останавливаем генератор звуков природы
+            // Останавливаем генераторы
+            if (melodyGenerator) {
+                melodyGenerator.stop();
+            }
             if (natureSoundsGenerator) {
                 natureSoundsGenerator.stop();
             }

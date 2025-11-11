@@ -267,14 +267,19 @@ class Patterns {
             melodyPatternType = 'random';
             harmonyPatternType = 'simple';
             bassPatternType = 'rhythmic';
-        } else { // calm
-            melodyPatternType = Math.random() > 0.5 ? 'wave' : 'descending';
-            harmonyPatternType = Math.random() > 0.5 ? 'simple' : 'random';
-            bassPatternType = Math.random() > 0.5 ? 'simple' : 'arpeggio';
+        } else { // calm, gentle, peaceful
+            // Для спокойных мелодий используем более мягкие паттерны
+            const calmPatterns = ['wave', 'descending', 'gentle_flow', 'soft_arpeggio'];
+            melodyPatternType = calmPatterns[Math.floor(Math.random() * calmPatterns.length)];
+            harmonyPatternType = Math.random() > 0.6 ? 'simple' : 'random';
+            bassPatternType = Math.random() > 0.7 ? 'simple' : 'arpeggio';
         }
 
         // Генерируем паттерны
-        const melody = this.melodyPatterns[melodyPatternType].generate(scale);
+        const melody = this.melodyPatterns[melodyPatternType] ?
+            this.melodyPatterns[melodyPatternType].generate(scale) :
+            this.generateGentleFlowPattern(scale); // Fallback для новых паттернов
+
         const harmony = this.harmonyPatterns[harmonyPatternType].generate(scale);
         const bass = this.bassPatterns[bassPatternType].generate(scale, harmony);
 
@@ -283,5 +288,74 @@ class Patterns {
             harmony: harmony,
             bass: bass
         };
+    }
+
+    /**
+     * Генерирует мягкий, текучий паттерн для спокойных мелодий
+     * @param {Object} scale - объект гаммы
+     * @returns {Array} массив нот паттерна
+     */
+    generateGentleFlowPattern(scale) {
+        const notes = [];
+        const scaleNotes = scale.notes;
+        const length = 12 + Math.floor(Math.random() * 12); // 12-24 ноты
+
+        // Создаем плавную мелодию с небольшими интервалами
+        let currentIndex = Math.floor(Math.random() * 3); // Начинаем с нижней части гаммы
+
+        for (let i = 0; i < length; i++) {
+            // Выбираем следующую ноту с предпочтением к небольшим интервалам
+            const direction = Math.random() > 0.6 ? 1 : -1; // 60% вверх, 40% вниз
+            const step = Math.random() > 0.7 ? 2 : 1; // 70% на ступень, 30% через ступень
+
+            currentIndex = Math.max(0, Math.min(scaleNotes.length - 1, currentIndex + (direction * step)));
+
+            const octave = 4 + Math.floor(currentIndex / 7);
+            const duration = 0.4 + Math.random() * 0.4; // 0.4-0.8 секунды
+
+            notes.push({
+                pitch: scaleNotes[currentIndex],
+                octave: octave,
+                duration: duration
+            });
+        }
+
+        return notes;
+    }
+
+    /**
+     * Генерирует мягкий арпеджио паттерн
+     * @param {Object} scale - объект гаммы
+     * @returns {Array} массив нот паттерна
+     */
+    generateSoftArpeggioPattern(scale) {
+        const notes = [];
+        const scaleNotes = scale.notes;
+        const length = 16; // Фиксированная длина для арпеджио
+
+        // Создаем арпеджио из 4 нот гаммы
+        const baseNotes = scaleNotes.slice(0, 4);
+
+        for (let cycle = 0; cycle < 4; cycle++) {
+            // Вверх
+            for (let i = 0; i < baseNotes.length; i++) {
+                notes.push({
+                    pitch: baseNotes[i],
+                    octave: 4,
+                    duration: 0.3
+                });
+            }
+
+            // Вниз (с небольшим изменением)
+            for (let i = baseNotes.length - 2; i >= 0; i--) {
+                notes.push({
+                    pitch: baseNotes[i],
+                    octave: 4,
+                    duration: 0.3
+                });
+            }
+        }
+
+        return notes;
     }
 }

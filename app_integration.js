@@ -115,6 +115,9 @@ function stopAllAudio(fadeOutSec=0.6){
   for (const info of mediaNodes.values()){
     try { fadeOutAndPause(info, fadeOutSec); } catch(e){}
   }
+  if (typeof melodyGenerator !== 'undefined' && melodyGenerator && melodyGenerator.stop) {
+    try{ melodyGenerator.stop(); }catch(e){}
+  }
   if (typeof natureSoundsGenerator !== 'undefined' && natureSoundsGenerator && natureSoundsGenerator.stop) {
     try{ natureSoundsGenerator.stop(); }catch(e){}
   }
@@ -283,16 +286,22 @@ document.addEventListener('DOMContentLoaded', async ()=>{
     stopAllAudio();
   });
   document.getElementById('genPlay').addEventListener('click', ()=>{
-    const env = document.getElementById('envSelect').value || 'forest';
-    if (typeof natureSoundsGenerator !== 'undefined' && natureSoundsGenerator && natureSoundsGenerator.generateAndPlay) {
+    const mood = document.getElementById('moodSelect').value || 'calm';
+    if (typeof melodyGenerator !== 'undefined' && melodyGenerator && melodyGenerator.generateAndPlay) {
+      melodyGenerator.generateAndPlay({mood: mood, duration: 180, fadeInTime: 60});
+    } else if (typeof natureSoundsGenerator !== 'undefined' && natureSoundsGenerator && natureSoundsGenerator.generateAndPlay) {
+      // Fallback к старому генератору
+      const env = mood === 'calm' ? 'morning' : mood === 'gentle' ? 'forest' : 'ocean';
       natureSoundsGenerator.generateAndPlay({environment: env, duration: 90, fadeInTime: 8});
     } else {
       alert('Генератор недоступен в этом окружении');
     }
   });
   document.getElementById('genStop').addEventListener('click', ()=>{
-    if (typeof natureSoundsGenerator !== 'undefined' && natureSoundsGenerator && natureSoundsGenerator.stop) {
-      try { natureSoundsGenerator.stop(); } catch(e) {}
+    if (typeof melodyGenerator !== 'undefined' && melodyGenerator && melodyGenerator.stop) {
+      try { melodyGenerator.stop(); } catch(e){}
+    } else if (typeof natureSoundsGenerator !== 'undefined' && natureSoundsGenerator && natureSoundsGenerator.stop) {
+      try { natureSoundsGenerator.stop(); } catch(e){}
     }
   });
   document.getElementById('snooze').addEventListener('click', snoozeFive);
