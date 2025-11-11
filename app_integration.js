@@ -285,44 +285,417 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   document.getElementById('stopAll').addEventListener('click', ()=>{
     stopAllAudio();
   });
-  // Settings toggle functionality
-  const settingsBtn = document.getElementById('settingsBtn');
-  const soundSettings = document.getElementById('soundSettings');
+  // Android-style Alarm Clock Interface
 
-  settingsBtn.addEventListener('click', () => {
-    soundSettings.classList.toggle('hidden');
-    settingsBtn.classList.toggle('active');
+  // Alarm management
+  let alarms = JSON.parse(localStorage.getItem('motiv_alarms') || '[]');
+  let timers = JSON.parse(localStorage.getItem('motiv_timers') || '[]');
+
+  const alarmsList = document.getElementById('alarmsList');
+  const timersList = document.getElementById('timersList');
+
+  // Default alarm if none exist
+  if (alarms.length === 0) {
+    alarms.push({
+      id: Date.now(),
+      time: '07:00',
+      label: 'Будильник',
+      enabled: true,
+      melodyType: 'calm',
+      fadeInTime: 60,
+      duration: 180,
+      startVolume: 0.1,
+      maxVolume: 0.8,
+      preAlarm: 0
+    });
+    saveAlarms();
+  }
+
+  // Default timer if none exist
+  if (timers.length === 0) {
+    timers.push({
+      id: Date.now(),
+      duration: 300, // 5 minutes
+      label: 'Таймер',
+      melodyType: 'gentle',
+      fadeInTime: 30,
+      startVolume: 0.2,
+      maxVolume: 0.9
+    });
+    saveTimers();
+  }
+
+  function saveAlarms() {
+    localStorage.setItem('motiv_alarms', JSON.stringify(alarms));
+  }
+
+  function saveTimers() {
+    localStorage.setItem('motiv_timers', JSON.stringify(timers));
+  }
+
+  function renderAlarms() {
+    alarmsList.innerHTML = '';
+    alarms.forEach(alarm => {
+      const alarmItem = document.createElement('div');
+      alarmItem.className = `alarm-item ${alarm.enabled ? 'active' : ''}`;
+
+      alarmItem.innerHTML = `
+        <div class="alarm-left">
+          <div class="alarm-switch ${alarm.enabled ? 'active' : ''}" data-id="${alarm.id}"></div>
+          <div>
+            <div class="alarm-time">${alarm.time}</div>
+            <div class="alarm-label">${alarm.label}</div>
+          </div>
+        </div>
+        <div class="alarm-right">
+          <button class="alarm-settings" data-id="${alarm.id}">⚙️</button>
+          <button class="alarm-delete" data-id="${alarm.id}">🗑️</button>
+        </div>
+      `;
+
+      alarmsList.appendChild(alarmItem);
+    });
+  }
+
+  function renderTimers() {
+    timersList.innerHTML = '';
+    timers.forEach(timer => {
+      const timerItem = document.createElement('div');
+      timerItem.className = 'timer-item';
+
+      const minutes = Math.floor(timer.duration / 60);
+      const seconds = timer.duration % 60;
+      const timeDisplay = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+      timerItem.innerHTML = `
+        <div class="timer-left">
+          <div class="timer-display">${timeDisplay}</div>
+          <div class="timer-label">${timer.label}</div>
+        </div>
+        <div class="timer-controls">
+          <button class="timer-play" data-id="${timer.id}">▶️</button>
+          <button class="timer-pause" data-id="${timer.id}" style="display:none">⏸️</button>
+          <button class="timer-reset" data-id="${timer.id}">🔄</button>
+        </div>
+        <div class="timer-right">
+          <button class="timer-settings" data-id="${timer.id}">⚙️</button>
+          <button class="timer-delete" data-id="${timer.id}">🗑️</button>
+        </div>
+      `;
+
+      timersList.appendChild(timerItem);
+    });
+  }
+
+  // Event listeners for alarms
+  document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('alarm-switch')) {
+      const id = parseInt(e.target.dataset.id);
+      const alarm = alarms.find(a => a.id === id);
+      if (alarm) {
+        alarm.enabled = !alarm.enabled;
+        saveAlarms();
+        renderAlarms();
+      }
+    }
+
+    if (e.target.classList.contains('alarm-settings')) {
+      const id = parseInt(e.target.dataset.id);
+      openAlarmSettings(id);
+    }
+
+    if (e.target.classList.contains('alarm-delete')) {
+      const id = parseInt(e.target.dataset.id);
+      alarms = alarms.filter(a => a.id !== id);
+      saveAlarms();
+      renderAlarms();
+    }
+
+    if (e.target.id === 'addAlarmBtn') {
+      addNewAlarm();
+    }
+
+    // Timer events
+    if (e.target.classList.contains('timer-play')) {
+      const id = parseInt(e.target.dataset.id);
+      startTimer(id);
+    }
+
+    if (e.target.classList.contains('timer-pause')) {
+      const id = parseInt(e.target.dataset.id);
+      pauseTimer(id);
+    }
+
+    if (e.target.classList.contains('timer-reset')) {
+      const id = parseInt(e.target.dataset.id);
+      resetTimer(id);
+    }
+
+    if (e.target.classList.contains('timer-settings')) {
+      const id = parseInt(e.target.dataset.id);
+      openTimerSettings(id);
+    }
+
+    if (e.target.classList.contains('timer-delete')) {
+      const id = parseInt(e.target.dataset.id);
+      timers = timers.filter(t => t.id !== id);
+      saveTimers();
+      renderTimers();
+    }
+
+    if (e.target.id === 'addTimerBtn') {
+      addNewTimer();
+    }
+
+    if (e.target.id === 'stopAll') {
+      stopAllAudio();
+    }
   });
 
-  // Volume display updates
-  const volumeInput = document.getElementById('volume');
-  const volumeValue = document.getElementById('volumeValue');
+  function addNewAlarm() {
+    const newAlarm = {
+      id: Date.now(),
+      time: '07:00',
+      label: 'Новый будильник',
+      enabled: true,
+      melodyType: 'calm',
+      fadeInTime: 60,
+      duration: 180,
+      startVolume: 0.1,
+      maxVolume: 0.8,
+      preAlarm: 0
+    };
+    alarms.push(newAlarm);
+    saveAlarms();
+    renderAlarms();
+    openAlarmSettings(newAlarm.id);
+  }
 
-  volumeInput.addEventListener('input', () => {
-    const value = Math.round(volumeInput.value * 100);
-    volumeValue.textContent = value + '%';
-  });
+  function addNewTimer() {
+    const newTimer = {
+      id: Date.now(),
+      duration: 300,
+      label: 'Новый таймер',
+      melodyType: 'gentle',
+      fadeInTime: 30,
+      startVolume: 0.2,
+      maxVolume: 0.9
+    };
+    timers.push(newTimer);
+    saveTimers();
+    renderTimers();
+    openTimerSettings(newTimer.id);
+  }
 
-  // Settings volume displays
-  const startVolumeInput = document.getElementById('startVolume');
-  const startVolumeValue = document.getElementById('startVolumeValue');
-  const maxVolumeInput = document.getElementById('maxVolume');
-  const maxVolumeValue = document.getElementById('maxVolumeValue');
+  function openAlarmSettings(alarmId) {
+    const alarm = alarms.find(a => a.id === alarmId);
+    if (!alarm) return;
 
-  startVolumeInput.addEventListener('input', () => {
-    const value = Math.round(startVolumeInput.value * 100);
-    startVolumeValue.textContent = value + '%';
-  });
+    const modal = document.createElement('div');
+    modal.className = 'alarm-modal show';
+    modal.innerHTML = `
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Настройки будильника</h3>
+          <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-field">
+            <label>Время</label>
+            <input type="time" id="alarmTime" value="${alarm.time}">
+          </div>
+          <div class="modal-field">
+            <label>Название</label>
+            <input type="text" id="alarmLabel" value="${alarm.label}">
+          </div>
+          <div class="modal-field">
+            <label>Тип мелодии</label>
+            <select id="alarmMelodyType">
+              <option value="calm" ${alarm.melodyType === 'calm' ? 'selected' : ''}>Спокойная</option>
+              <option value="gentle" ${alarm.melodyType === 'gentle' ? 'selected' : ''}>Нежная</option>
+              <option value="peaceful" ${alarm.melodyType === 'peaceful' ? 'selected' : ''}>Мирная</option>
+              <option value="nature" ${alarm.melodyType === 'nature' ? 'selected' : ''}>Звуки природы</option>
+            </select>
+          </div>
+          <div class="modal-field">
+            <label>Длительность нарастания</label>
+            <select id="alarmFadeInTime">
+              <option value="30" ${alarm.fadeInTime == 30 ? 'selected' : ''}>30 сек</option>
+              <option value="60" ${alarm.fadeInTime == 60 ? 'selected' : ''}>1 мин</option>
+              <option value="90" ${alarm.fadeInTime == 90 ? 'selected' : ''}>1.5 мин</option>
+              <option value="120" ${alarm.fadeInTime == 120 ? 'selected' : ''}>2 мин</option>
+            </select>
+          </div>
+          <div class="modal-field">
+            <label>Общая длительность</label>
+            <select id="alarmDuration">
+              <option value="120" ${alarm.duration == 120 ? 'selected' : ''}>2 мин</option>
+              <option value="180" ${alarm.duration == 180 ? 'selected' : ''}>3 мин</option>
+              <option value="240" ${alarm.duration == 240 ? 'selected' : ''}>4 мин</option>
+              <option value="300" ${alarm.duration == 300 ? 'selected' : ''}>5 мин</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="modal-btn secondary" id="cancelAlarm">Отмена</button>
+          <button class="modal-btn primary" id="saveAlarm">Сохранить</button>
+        </div>
+      </div>
+    `;
 
-  maxVolumeInput.addEventListener('input', () => {
-    const value = Math.round(maxVolumeInput.value * 100);
-    maxVolumeValue.textContent = value + '%';
-  });
+    document.body.appendChild(modal);
 
-  // Initialize volume displays
-  volumeValue.textContent = Math.round(volumeInput.value * 100) + '%';
-  startVolumeValue.textContent = Math.round(startVolumeInput.value * 100) + '%';
-  maxVolumeValue.textContent = Math.round(maxVolumeInput.value * 100) + '%';
+    // Event listeners
+    modal.querySelector('.modal-close').addEventListener('click', () => modal.remove());
+    modal.querySelector('#cancelAlarm').addEventListener('click', () => modal.remove());
+    modal.querySelector('#saveAlarm').addEventListener('click', () => {
+      alarm.time = modal.querySelector('#alarmTime').value;
+      alarm.label = modal.querySelector('#alarmLabel').value;
+      alarm.melodyType = modal.querySelector('#alarmMelodyType').value;
+      alarm.fadeInTime = parseInt(modal.querySelector('#alarmFadeInTime').value);
+      alarm.duration = parseInt(modal.querySelector('#alarmDuration').value);
+      saveAlarms();
+      renderAlarms();
+      modal.remove();
+    });
+  }
+
+  function openTimerSettings(timerId) {
+    const timer = timers.find(t => t.id === timerId);
+    if (!timer) return;
+
+    const modal = document.createElement('div');
+    modal.className = 'timer-modal show';
+    modal.innerHTML = `
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Настройки таймера</h3>
+          <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-field">
+            <label>Длительность (минуты)</label>
+            <input type="number" id="timerDuration" value="${Math.floor(timer.duration / 60)}" min="1" max="60">
+          </div>
+          <div class="modal-field">
+            <label>Название</label>
+            <input type="text" id="timerLabel" value="${timer.label}">
+          </div>
+          <div class="modal-field">
+            <label>Тип мелодии</label>
+            <select id="timerMelodyType">
+              <option value="calm" ${timer.melodyType === 'calm' ? 'selected' : ''}>Спокойная</option>
+              <option value="gentle" ${timer.melodyType === 'gentle' ? 'selected' : ''}>Нежная</option>
+              <option value="peaceful" ${timer.melodyType === 'peaceful' ? 'selected' : ''}>Мирная</option>
+              <option value="nature" ${timer.melodyType === 'nature' ? 'selected' : ''}>Звуки природы</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="modal-btn secondary" id="cancelTimer">Отмена</button>
+          <button class="modal-btn primary" id="saveTimer">Сохранить</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // Event listeners
+    modal.querySelector('.modal-close').addEventListener('click', () => modal.remove());
+    modal.querySelector('#cancelTimer').addEventListener('click', () => modal.remove());
+    modal.querySelector('#saveTimer').addEventListener('click', () => {
+      timer.duration = parseInt(modal.querySelector('#timerDuration').value) * 60;
+      timer.label = modal.querySelector('#timerLabel').value;
+      timer.melodyType = modal.querySelector('#timerMelodyType').value;
+      saveTimers();
+      renderTimers();
+      modal.remove();
+    });
+  }
+
+  // Timer functionality
+  let activeTimers = new Map();
+
+  function startTimer(timerId) {
+    const timer = timers.find(t => t.id === timerId);
+    if (!timer) return;
+
+    let remainingTime = timer.duration;
+    const timerItem = document.querySelector(`[data-id="${timerId}"].timer-item`);
+    const display = timerItem.querySelector('.timer-display');
+    const playBtn = timerItem.querySelector('.timer-play');
+    const pauseBtn = timerItem.querySelector('.timer-pause');
+
+    playBtn.style.display = 'none';
+    pauseBtn.style.display = 'flex';
+
+    const interval = setInterval(() => {
+      remainingTime--;
+      const minutes = Math.floor(remainingTime / 60);
+      const seconds = remainingTime % 60;
+      display.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+      if (remainingTime <= 0) {
+        clearInterval(interval);
+        activeTimers.delete(timerId);
+        // Trigger alarm sound
+        if (typeof melodyGenerator !== 'undefined' && melodyGenerator.generateAndPlay) {
+          melodyGenerator.generateAndPlay({
+            mood: timer.melodyType,
+            duration: 60,
+            fadeInTime: 10,
+            startVolume: timer.startVolume,
+            maxVolume: timer.maxVolume
+          });
+        }
+        resetTimer(timerId);
+      }
+    }, 1000);
+
+    activeTimers.set(timerId, { interval, remainingTime });
+  }
+
+  function pauseTimer(timerId) {
+    const timerData = activeTimers.get(timerId);
+    if (timerData) {
+      clearInterval(timerData.interval);
+      activeTimers.delete(timerId);
+
+      const timerItem = document.querySelector(`[data-id="${timerId}"].timer-item`);
+      const playBtn = timerItem.querySelector('.timer-play');
+      const pauseBtn = timerItem.querySelector('.timer-pause');
+
+      playBtn.style.display = 'flex';
+      pauseBtn.style.display = 'none';
+    }
+  }
+
+  function resetTimer(timerId) {
+    const timer = timers.find(t => t.id === timerId);
+    if (!timer) return;
+
+    const timerData = activeTimers.get(timerId);
+    if (timerData) {
+      clearInterval(timerData.interval);
+      activeTimers.delete(timerId);
+    }
+
+    const timerItem = document.querySelector(`[data-id="${timerId}"].timer-item`);
+    const display = timerItem.querySelector('.timer-display');
+    const playBtn = timerItem.querySelector('.timer-play');
+    const pauseBtn = timerItem.querySelector('.timer-pause');
+
+    const minutes = Math.floor(timer.duration / 60);
+    const seconds = timer.duration % 60;
+    display.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+    playBtn.style.display = 'flex';
+    pauseBtn.style.display = 'none';
+  }
+
+  // Initialize the interface
+  renderAlarms();
+  renderTimers();
 
   document.getElementById('genPlay').addEventListener('click', ()=>{
     const mood = document.getElementById('moodSelect').value || 'calm';
