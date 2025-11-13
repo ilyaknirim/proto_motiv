@@ -659,10 +659,41 @@ function resetTimer(timerId) {
   pauseBtn.style.display = 'none';
 }
 
+// Функции для работы с темами
+function initTheme() {
+  const savedTheme = localStorage.getItem('motiv_theme') || 'dark';
+  document.body.classList.toggle('theme-light', savedTheme === 'light');
+  document.body.classList.toggle('theme-dark', savedTheme === 'dark');
+  updateThemeIcon();
+}
+
+function toggleTheme() {
+  const isLight = document.body.classList.contains('theme-light');
+  const newTheme = isLight ? 'dark' : 'light';
+
+  document.body.classList.add('theme-transition');
+  document.body.classList.toggle('theme-light');
+  document.body.classList.toggle('theme-dark');
+
+  localStorage.setItem('motiv_theme', newTheme);
+  updateThemeIcon();
+
+  setTimeout(() => {
+    document.body.classList.remove('theme-transition');
+  }, 500);
+}
+
+function updateThemeIcon() {
+  const icon = document.querySelector('.theme-icon');
+  if (icon) {
+    icon.textContent = document.body.classList.contains('theme-light') ? '☀️' : '🌙';
+  }
+}
+
 // Инициализация приложения
 document.addEventListener('DOMContentLoaded', async ()=>{
-  // Установка темной темы
-  document.body.classList.add('theme-dark');
+  // Инициализация темы
+  initTheme();
   showToast('Доброе утро! Motiv Sunrise готов к работе', 'success', 2500);
 
   // Инициализация обработчиков жестов
@@ -737,6 +768,12 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   }
   saveStats(stats);
   renderStats();
+
+  // Обработчик переключателя тем
+  const themeToggle = document.getElementById('themeToggle');
+  if (themeToggle) {
+    themeToggle.addEventListener('click', toggleTheme);
+  }
 
   // Обработчики событий
   document.addEventListener('click', (e) => {
