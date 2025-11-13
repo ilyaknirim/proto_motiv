@@ -23,8 +23,12 @@ async function initMelodyGenerator() {
         melodyGenerator = new MelodyGenerator();
     } catch (error) {
         console.warn('Не удалось загрузить новый генератор мелодий, используем старый:', error);
-        // Fallback к старому генератору
-        natureSoundsGenerator = new NatureSoundsGenerator();
+        // Fallback к старому генератору - импортируем из основного скрипта
+        if (typeof window.NatureSoundsGenerator !== 'undefined') {
+            natureSoundsGenerator = new window.NatureSoundsGenerator();
+        } else {
+            console.error('NatureSoundsGenerator не найден');
+        }
     }
 
     // Заменяем функцию playRandomSound в основном скрипте
